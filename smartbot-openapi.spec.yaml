@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description: |-
+    This is a shopping assistant  Server based on the OpenAPI 3.0 specification.  This server allows you to create ticket for customer complains such as issue with their order, canceling their order, checking thier order status, applying for refund and reschedulling the delivery of their order
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://host.docker.internal:4008
+tags:
+  - name: ticket
+    description: Everything customer requests and complains. It is used by the store owners to manage customer requests and complains
+paths:
+  /ticket:
+    post:
+      tags:
+        - ticket
+      summary: Add a new ticket
+      description: Add a new ticket that has been requested by customers.
+      operationId: addTicket
+      requestBody:
+        description: Create a new ticket for the customer
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ticket"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Ticket"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Ticket"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+        "405":
+          description: Invalid input
+
+components:
+  schemas:
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        priority:
+          type: string
+          enum:
+            - low
+            - medium
+        customer_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          description: Order Status
+          example: approved
+          enum:
+            - blocked
+            - pending
+            - resolved
+        complete:
+          type: boolean
+      xml:
+        name: ticket
