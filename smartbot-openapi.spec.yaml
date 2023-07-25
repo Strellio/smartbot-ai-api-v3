@@ -14,7 +14,7 @@ externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
 servers:
-  - url: http://host.docker.internal:4008
+  - url: http://localhost:4008
 tags:
   - name: ticket
     description: Everything customer requests and complains. It is used by the store owners to manage customer requests and complains

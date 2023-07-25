@@ -4,14 +4,7 @@ from langcorn import create_service
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.conversation import conversation
-
-
-class Input(BaseModel):
-    human_input: str
-
-
-class Output(BaseModel):
-    output: str
+from app.models import Input, Output
 
 
 app = FastAPI()
@@ -21,8 +14,8 @@ load_dotenv()
 
 @app.post("/conversation")
 async def input(input: Input):
-    output = Output(output=conversation(input.human_input))
-    return output
+    result = Output(output=conversation(input))
+    return [{"text": result.output, "recipient_id": input.sender}]
 
 origins = [
     "<http://localhost>",
