@@ -1,10 +1,9 @@
-from langchain.agents import initialize_agent, Tool
+from langchain.agents import initialize_agent, Tool, LLMSingleActionAgent
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, ConversationChain
 from langchain.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
 from langchain.agents import AgentType
-import os
 import yaml
 from langchain.agents.agent_toolkits.openapi.spec import reduce_openapi_spec
 from langchain.requests import RequestsWrapper
@@ -103,7 +102,7 @@ Human: {input}
           chat_history=memory.load_memory_variables({})))
 
     conversational_agent = initialize_agent(
-        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+        agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION,
         tools=tools,
         llm=llm,
         verbose=True,
