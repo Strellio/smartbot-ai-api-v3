@@ -109,6 +109,7 @@ Human: {input}
         max_iterations=3,
         memory=memory,
         handle_parsing_errors=True,
+        inpu
     )
 
     result = llm_chain.run(
