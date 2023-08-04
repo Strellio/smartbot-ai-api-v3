@@ -33,4 +33,5 @@ class PromptTemplateWithTools(StringPromptTemplate):
         )
         # Create a list of tool names for the tools provided
         kwargs["tool_names"] = ", ".join([tool.name for tool in tools])
+        print(self.template.format(**kwargs))
         return self.template.format(**kwargs)

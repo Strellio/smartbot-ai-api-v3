@@ -24,10 +24,11 @@ class SupportTicketOutputParser(AgentOutputParser):
                 log=llm_output,
             )
         # Parse out the action and action input
-        regex = r"Action: (.*?)[\n]*Action Input: (.*)"
+        regex = r"Action:(.*?)[\n]*Action Input: (.*)"
         # regex =r"Order Support Ticket Action Input: (.*)"
         match = re.search(regex, llm_output, re.DOTALL)
         if not match:
+            print("no match ticket")
             return AgentFinish(
                 {
                     "output": llm_output
@@ -38,12 +39,13 @@ class SupportTicketOutputParser(AgentOutputParser):
             # raise OutputParserException(f"Could not parse LLM output: `{llm_output}`")
         action = match.group(1).strip()
         action_input = match.group(2)
-        payload = json.loads(action_input)
-        r = requests.post(payload["url"], payload["data"])
+        print("action", action_input)
+        # payload = json.loads(action_input)
+        # r = requests.post(payload["url"], payload["data"])
         return AgentFinish(
             # Return values is generally always a dictionary with a single `output` key
             # It is not recommended to try anything else at the moment :)
-            return_values={"output": r.text},
+            return_values={"output": llm_output},
             log=llm_output,
         )
         # Return the action and action input
