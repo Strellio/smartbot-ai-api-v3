@@ -1,6 +1,9 @@
 
 from app.agents.assistant.agent import ShopAssistant
 
+from langchain.document_loaders import StripeLoader
+
+
 from app.models import Input
 from app.utils.llm import getLLM
 from app.utils.memory import getMemory
