@@ -13,13 +13,14 @@ import json
 class SupportTicketOutputParser(AgentOutputParser):
 
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
+        print("llm_output", llm_output)
         # Check if agent should finish
-        if "Final Answer:" in llm_output:
+        if "Assistant:" in llm_output:
             return AgentFinish(
                 # Return values is generally always a dictionary with a single `output` key
                 # It is not recommended to try anything else at the moment :)
                 return_values={"output": llm_output.split(
-                    "Final Answer:")[-1].strip()},
+                    "Assistant:")[-1].strip()},
                 log=llm_output,
             )
         # Parse out the action and action input

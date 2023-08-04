@@ -17,13 +17,14 @@ class PromptTemplateWithTools(StringPromptTemplate):
     def format(self, **kwargs) -> str:
         # Get the intermediate steps (AgentAction, Observation tuples)
         # Format them in a particular way
-        intermediate_steps = kwargs.pop("intermediate_steps")
-        thoughts = ""
-        for action, observation in intermediate_steps:
-            thoughts += action.log
-            thoughts += f"\nObservation: {observation}\nThought: "
-        # Set the agent_scratchpad variable to that value
-        kwargs["agent_scratchpad"] = thoughts
+        if "intermediate_steps" in kwargs:
+            intermediate_steps = kwargs.pop("intermediate_steps")
+            thoughts = ""
+            for action, observation in intermediate_steps:
+                thoughts += action.log
+                thoughts += f"\nObservation: {observation}\nThought: "
+            # Set the agent_scratchpad variable to that value
+            kwargs["agent_scratchpad"] = thoughts
         ############## NEW ######################
         tools = self.tools_getter(kwargs["input"])
         # Create a tools variable from the list of tools provided
