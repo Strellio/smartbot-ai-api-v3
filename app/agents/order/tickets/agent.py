@@ -28,9 +28,6 @@ class OrderTicketAgent(BaseModel):
             max_iterations=max_iterations,
         )
 
-        print("ticket history", memory.load_memory_variables(
-            {})["chat_history"])
-
         order_ticket_agent = AgentExecutor.from_agent_and_tools(
             agent=order_action_with_tools, tools=support_ticket_tools, verbose=verbose, max_iterations=max_iterations, memory=memory
 

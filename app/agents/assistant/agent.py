@@ -39,20 +39,21 @@ class ShopAssistant(BaseModel):
             allowed_tools=tool_names,
             verbose=verbose,
             max_iterations=max_iterations,
+
         )
 
-        # shop_assistant_executor = initialize_agent(
-        #     agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
-        #     tools=tools,
-        #     llm=llm,
-        #     verbose=verbose,
-        #     max_iterations=max_iterations,
-        #     memory=memory
+        shop_assistant_executor = initialize_agent(
+            agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+            tools=tools,
+            llm=llm,
+            verbose=verbose,
+            max_iterations=max_iterations,
+            memory=memory
+        )
+
+        # shop_assistant_executor = AgentExecutor.from_agent_and_tools(
+        #     agent=shop_assistant_with_tools, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=memory
         # )
-
-        shop_assistant_executor = AgentExecutor.from_agent_and_tools(
-            agent=shop_assistant_with_tools, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=memory
-        )
 
         return self(shop_assistant_executor=shop_assistant_executor, memory=memory, shop=shop, max_iterations=max_iterations)
 

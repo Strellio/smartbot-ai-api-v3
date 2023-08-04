@@ -39,14 +39,7 @@ class SupportTicketOutputParser(AgentOutputParser):
             # raise OutputParserException(f"Could not parse LLM output: `{llm_output}`")
         action = match.group(1).strip()
         action_input = match.group(2)
-        print("action", action_input)
-        # payload = json.loads(action_input)
-        # r = requests.post(payload["url"], payload["data"])
-        return AgentFinish(
-            # Return values is generally always a dictionary with a single `output` key
-            # It is not recommended to try anything else at the moment :)
-            return_values={"output": llm_output},
-            log=llm_output,
-        )
+        print("action", action)
+        print("action_input", action_input)
         # Return the action and action input
-        # return AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
+        return AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
