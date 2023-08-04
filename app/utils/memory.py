@@ -11,4 +11,4 @@ def getMemory(session_id: str, memory_key: str):
     memory = ConversationBufferMemory(
         memory_key=memory_key, chat_memory=message_history, k=5, return_messages=True, human_prefix="Customer"
     )
-    return memory, message_history
+    return memory

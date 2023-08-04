@@ -21,7 +21,7 @@ class ShopAssistant(BaseModel):
     @classmethod
     def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, shop, verbose=False, max_iterations=3):
 
-        tools = getTools(llm=llm, memory=ReadOnlySharedMemory(memory=memory), verbose=verbose,
+        tools = getTools(llm=llm, memory=memory, verbose=verbose,
                          max_iterations=max_iterations)
 
         tool_names = [tool.name for tool in tools]
@@ -48,7 +48,8 @@ class ShopAssistant(BaseModel):
             llm=llm,
             verbose=verbose,
             max_iterations=max_iterations,
-            memory=memory
+            memory=memory,
+            output_parser=output_parser,
         )
 
         # shop_assistant_executor = AgentExecutor.from_agent_and_tools(
