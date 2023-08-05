@@ -1,8 +1,8 @@
 from datetime import datetime
 from lib.db import db
 from bson.objectid import ObjectId
-from models import customerModel
-from services.customers import updateCustomer
+from app.lib.db import customerModel
+from app.services.customers import updateCustomer
 
 
 def getSubcription(query):

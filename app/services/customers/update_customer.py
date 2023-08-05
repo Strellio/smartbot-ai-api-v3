@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import customerModel
+from app.lib.db import customerModel
 
 
 def updateCustomer(query, update):

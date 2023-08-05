@@ -11,3 +11,5 @@ python-dotenv
 pymongo
 chromadb
 faiss-cpu 
+datetime
+bson

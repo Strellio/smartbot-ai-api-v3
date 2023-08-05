@@ -2,7 +2,7 @@ import requests
 from lib.db import db
 from bson.objectid import ObjectId
 from os import getenv
-from models import (businessModel, chatPlatformModel)
+from app.lib.db import (businessModel, chatPlatformModel)
 
 
 def getBusinessBy(id):

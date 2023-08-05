@@ -1,6 +1,6 @@
 from lib.db import db
 from bson.objectid import ObjectId
-from models import customerModel
+from app.lib.db import customerModel
 
 
 def talkToAgent(customerId: str):

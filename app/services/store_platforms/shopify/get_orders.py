@@ -1,6 +1,5 @@
 import requests
 import os
-from lib.utils import decrypt
 
 
 def getOrders(domain, accessToken, query={}, *args, **kwargs):

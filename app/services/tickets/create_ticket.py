@@ -1,7 +1,6 @@
 from datetime import datetime
-from lib.db import db
 from bson.objectid import ObjectId
-from models import ticketModel
+from app.lib.db import ticketModel
 from enum import Enum
 
 
