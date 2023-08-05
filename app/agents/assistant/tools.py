@@ -1,3 +1,4 @@
+from os import getenv
 from langchain.agents import load_tools, Tool
 from langchain.chat_models import ChatOpenAI
 from langchain.indexes import VectorstoreIndexCreator
@@ -15,15 +16,12 @@ from app.agents.order.tickets.agent import OrderTicketAgent
 from app.loaders.shopify import ShopifyLoader
 
 
-def setupProductKnowlegeBase(llm: ChatOpenAI, verbose=False, max_iterations=3):
-    shpify_loader = ShopifyLoader(domain="https://smart-store-wis.myshopify.com",
-                                  access_token="shpua_0b2ba5fa999251310ae908280c4ea62e", resource="products")
-
-    redis_host = "localhost"
-    redis_port = 6379
+def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
+    shpify_loader = ShopifyLoader(domain=business.get("shop").get("external_platform_domain"),
+                                  access_token=business.get("shop").get("external_access_token"), resource="products")
 
     index = VectorstoreIndexCreator(
-        vectorstore_cls=Redis, vectorstore_kwargs={"index_name": "products", "redis_url": f"redis://{redis_host}:{redis_port}/3"}).from_loaders([shpify_loader])
+        vectorstore_cls=Redis, vectorstore_kwargs={"index_name": "products", "redis_url": f"{getenv('REDIS_URL')}/3"}).from_loaders([shpify_loader])
 
     stripe_doc_retriever = index.vectorstore.as_retriever()
     knowledge_base = RetrievalQA.from_chain_type(
@@ -33,7 +31,7 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, verbose=False, max_iterations=3):
     return knowledge_base
 
 
-def getTools(llm: ChatOpenAI, memory, verbose=False, max_iterations=3):
+def getTools(llm: ChatOpenAI, memory, business, verbose=False, max_iterations=3):
     # query to get_tools can be used to be embedded and relevant tools found
     # see here: https://langchain-langchain.vercel.app/docs/use_cases/agents/custom_agent_with_plugin_retrieval#tool-retriever
 
@@ -41,7 +39,7 @@ def getTools(llm: ChatOpenAI, memory, verbose=False, max_iterations=3):
     order_ticket_agent = OrderTicketAgent.init(llm=llm,
                                                memory=memory, verbose=verbose, max_iterations=max_iterations)
     knowledge_base = setupProductKnowlegeBase(
-        llm=llm, verbose=verbose, max_iterations=max_iterations)
+        llm=llm, verbose=verbose, business=business)
 
     tools = [
         Tool(

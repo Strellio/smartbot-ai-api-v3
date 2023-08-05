@@ -14,14 +14,14 @@ from app.agents.assistant.tools import getTools
 
 
 class ShopAssistant(BaseModel):
-    shop: Any = Field(...)
+    business: Any = Field(...)
     memory: ConversationBufferMemory = Field(...)
     shop_assistant_executor: Union[AgentExecutor, None] = Field(...)
 
     @classmethod
-    def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, shop, verbose=False, max_iterations=3):
+    def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, business, chatPlatform, verbose=False, max_iterations=3):
 
-        tools = getTools(llm=llm, memory=memory, verbose=verbose,
+        tools = getTools(llm=llm, memory=memory, verbose=verbose, business=business,
                          max_iterations=max_iterations)
 
         tool_names = [tool.name for tool in tools]
@@ -56,7 +56,7 @@ class ShopAssistant(BaseModel):
         #     agent=shop_assistant_with_tools, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=memory
         # )
 
-        return self(shop_assistant_executor=shop_assistant_executor, memory=memory, shop=shop, max_iterations=max_iterations)
+        return self(shop_assistant_executor=shop_assistant_executor, memory=memory, business=business, max_iterations=max_iterations)
 
     def run(self, input):
         ouput = self.shop_assistant_executor.run(

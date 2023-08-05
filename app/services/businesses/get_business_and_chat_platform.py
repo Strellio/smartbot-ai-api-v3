@@ -1,7 +1,5 @@
-import requests
-from lib.db import db
 from bson.objectid import ObjectId
-from os import getenv
+from app.models import InputMetadata
 from app.lib.db import (businessModel, chatPlatformModel)
 
 
@@ -17,10 +15,9 @@ def getChatPlatformByIdAndBusinessId(id, businessId):
 
 
 # GetBusiness and chat platform
-def getBusinessAndChatPlatform(metadata) -> tuple:
-    businessId = metadata.get("business_id", getenv("TEST_BUSINESS_ID"))
-    chatPlatformId = metadata.get(
-        "chat_paltform_id", getenv("TEST_CHAT_PLATFORM_ID"))
+def getBusinessAndChatPlatform(metadata: InputMetadata) -> tuple:
+    businessId = metadata.business_id
+    chatPlatformId = metadata.chat_platform_id
     business = getBusinessBy(businessId)
     chatPlatform = getChatPlatformByIdAndBusinessId(
         chatPlatformId, business.get("_id"))
