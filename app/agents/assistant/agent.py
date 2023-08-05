@@ -49,7 +49,7 @@ class ShopAssistant(BaseModel):
             verbose=verbose,
             max_iterations=max_iterations,
             memory=memory,
-            output_parser=output_parser,
+            # agent_kwargs={"output_parser": output_parser}
         )
 
         # shop_assistant_executor = AgentExecutor.from_agent_and_tools(
