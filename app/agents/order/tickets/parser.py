@@ -14,6 +14,22 @@ class SupportTicketOutputParser(AgentOutputParser):
 
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         print("llm_output", llm_output)
+
+        if ("create_support_ticket" in llm_output):
+            regex = r'create_support_ticket:(\{.*\})'
+            match = re.search(regex, llm_output)
+            payloadStr = match.group(1)
+            print("\n")
+            print("payloadStr", payloadStr)
+            payload = json.loads(payloadStr)
+            print("payload", payload)
+            return AgentFinish(
+                {
+                    "output": "I have created a support ticket for you."
+                },
+                llm_output,
+            )
+
         # Check if agent should finish
         if "Assistant:" in llm_output:
             return AgentFinish(
