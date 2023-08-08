@@ -14,12 +14,13 @@ class OrderTicketAgent(BaseModel):
     llm_chain: Union[LLMChain, None] = Field(...)
 
     @classmethod
-    def init(self, llm: ChatOpenAI, memory, verbose=False, max_iterations=3) -> "OrderTicketAgent":
+    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3) -> "OrderTicketAgent":
         llm_chain = LLMChain(
             llm=llm, prompt=order_ticket_prompt)
 
         order_action_with_tools = LLMSingleActionAgent(
-            output_parser=SupportTicketOutputParser(),
+            output_parser=SupportTicketOutputParser(
+                business=business, customer=customer, chat_platform=chat_platform),
             llm_chain=llm_chain,
             stop=["\nObservation:"],
             allowed_tools=support_ticket_tools_names,

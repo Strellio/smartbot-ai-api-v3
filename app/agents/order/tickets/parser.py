@@ -2,15 +2,27 @@
 import os
 import re
 import pandas as pd
-from typing import Union
+from typing import Any, Union
 from langchain.agents.agent import AgentOutputParser, OutputParserException
 from langchain.schema import AgentAction, AgentFinish
+from pydantic import BaseModel
+from app.agents.order.tickets.utils import generateTicketPayload
+from app.services.tickets.create_ticket import createTicket
 
 import requests
 import json
 
 
 class SupportTicketOutputParser(AgentOutputParser):
+    customer: Any
+    business: Any
+    chat_platform: Any
+
+    def __init__(self, customer: Any,  business: Any, chat_platform: Any) -> None:
+        super().__init__(customer=customer, business=business, chat_platform=chat_platform)
+        self.customer = customer
+        self.business = business
+        self.chat_platform = chat_platform
 
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         print("llm_output", llm_output)
@@ -22,7 +34,17 @@ class SupportTicketOutputParser(AgentOutputParser):
             print("\n")
             print("payloadStr", payloadStr)
             payload = json.loads(payloadStr)
-            print("payload", payload)
+
+            ticketInfo = generateTicketPayload(order_id=payload.get(
+                "orderID"), ticket_type=payload.get("type"), **payload)
+
+            print(self.customer.get("_id"), self.business.get(
+                "_id"), self.chat_platform.get("_id"), self.customer.get("email"))
+
+            result = createTicket(customer_id=self.customer.get("_id"), business_id=self.business.get(
+                "_id"), chat_platform_id=self.chat_platform.get("_id"), email=self.customer.get("email"), **ticketInfo)
+            print("result", result)
+
             return AgentFinish(
                 {
                     "output": "I have created a support ticket for you."

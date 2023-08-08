@@ -19,7 +19,7 @@ def createTicket(business_id, customer_id, chat_platform_id, email, order_number
         "order_id": order_id,
         "source": ObjectId(chat_platform_id),
         "description": description,
-        "priority": str(priority),
+        "priority": priority.value,
         "order_email": email,
         "created_at": datetime.now(),
         "updated_at": datetime.now()

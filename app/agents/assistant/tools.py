@@ -31,13 +31,13 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
     return knowledge_base
 
 
-def getTools(llm: ChatOpenAI, memory, business, verbose=False, max_iterations=3):
+def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3):
     # query to get_tools can be used to be embedded and relevant tools found
     # see here: https://langchain-langchain.vercel.app/docs/use_cases/agents/custom_agent_with_plugin_retrieval#tool-retriever
 
     # we only use one tool for now, but this is highly extensible!
     order_ticket_agent = OrderTicketAgent.init(llm=llm,
-                                               memory=memory, verbose=verbose, max_iterations=max_iterations)
+                                               memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
     knowledge_base = setupProductKnowlegeBase(
         llm=llm, verbose=verbose, business=business)
 

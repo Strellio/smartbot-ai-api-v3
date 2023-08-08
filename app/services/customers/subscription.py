@@ -1,17 +1,13 @@
 from datetime import datetime
-from lib.db import db
+from app.lib.db import db
 from bson.objectid import ObjectId
 from app.lib.db import customerModel
 from app.services.customers import updateCustomer
-
-
-def getSubcription(query):
-    document = customerModel.find_one(query)
-    return document
+from app.services.customers.get_customer import getCustomer
 
 
 def checkIfUserIsSubscribed(business_id, customer_id):
-    result = getSubcription(
+    result = getCustomer(
         {"business": ObjectId(business_id), "_id": ObjectId(customer_id)})
     if not result:
         return False
