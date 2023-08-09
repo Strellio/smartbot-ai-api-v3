@@ -51,7 +51,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
         Tool(
             name="OrderSupportTicket",
             func=order_ticket_agent.run,
-            return_direct=True,
+            # return_direct=True,
             description="useful for when you need to create a support ticket for an issue a customer has raised about their order"
 
         )
