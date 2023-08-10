@@ -6,7 +6,7 @@ from typing import Any, Union
 from langchain.agents.agent import AgentOutputParser, OutputParserException
 from langchain.schema import AgentAction, AgentFinish
 from pydantic import BaseModel
-from app.agents.order.tickets.utils import generateTicketPayload
+from app.agents.tickets.create.utils import generateTicketPayload
 from app.services.tickets.create_ticket import createTicket
 
 import requests

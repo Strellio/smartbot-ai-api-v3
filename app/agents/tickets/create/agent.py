@@ -3,10 +3,10 @@ from typing import Union
 from langchain import LLMChain
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
-from app.agents.order.tickets.parser import SupportTicketOutputParser
+from app.agents.tickets.create.parser import SupportTicketOutputParser
 from langchain.agents import LLMSingleActionAgent, AgentExecutor
-from app.agents.order.tickets.prompt import order_ticket_prompt
-from app.agents.order.tickets.tools import support_ticket_tools, support_ticket_tools_names
+from app.agents.tickets.create.prompt import order_ticket_prompt
+from app.agents.tickets.create.tools import support_ticket_tools, support_ticket_tools_names
 
 
 class OrderTicketAgent(BaseModel):

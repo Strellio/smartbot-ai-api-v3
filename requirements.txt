@@ -12,3 +12,4 @@ pymongo
 chromadb
 faiss-cpu 
 datetime
+promptwatch

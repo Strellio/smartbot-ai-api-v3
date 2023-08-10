@@ -1,6 +1,6 @@
 
 from app.template.custom_template import PromptTemplateWithTools
-from app.agents.order.tickets.tools import support_ticket_tools
+from app.agents.tickets.create.tools import support_ticket_tools
 
 order_support_ticket_prompts = """
 You are a assistant that assists customers to create order support tickets. 

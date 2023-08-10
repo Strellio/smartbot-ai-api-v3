@@ -7,6 +7,24 @@ from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
 from langchain.utils import get_from_env, stringify_dict
 
+
+def generate_sentences(product, domain):
+    sentence = f"Product ID {product['id']} with title '{product['title']}' is a {product['status']} {product['product_type']} available at {product['variants'][0]['price']} USD."
+    sentence += f" It has the handle '{product['handle']}' with product url {domain}/products/{product['handle']} and is provided by {product['vendor']}."
+    sentence += f" Tags: {product['tags']}."
+
+    if product['variants'][0]['requires_shipping']:
+        sentence += " Shipping is available."
+    else:
+        sentence += " No shipping available."
+
+    sentence += f" Weight: {product['variants'][0]['weight']} kg."
+    sentence += f" Description: {product['body_html']}"
+    sentence += f" Image URL: {product['image']['src']}"
+
+    return sentence
+
+
 SHOPIFY_ENDPOINTS = {
     "products": "/admin/products.json",
 }
@@ -35,7 +53,7 @@ class ShopifyLoader(BaseLoader):
         with urllib.request.urlopen(request) as response:
             json_data = json.loads(response.read().decode())
             products = json_data.get("products")
-            return [Document(page_content=f"{product.get('title', '')}", metadata=product) for product in products]
+            return [Document(page_content=f"{generate_sentences(product=product, domain=self.domain)}", metadata=product) for product in products]
 
     def _get_resource(self) -> List[Document]:
         endpoint = SHOPIFY_ENDPOINTS.get(self.resource)
