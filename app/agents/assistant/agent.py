@@ -24,23 +24,23 @@ class ShopAssistant(BaseModel):
         tools = getTools(llm=llm, memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
                          max_iterations=max_iterations)
 
-        tool_names = [tool.name for tool in tools]
+        # tool_names = [tool.name for tool in tools]
 
-        prompt = getShopAssistantPrompt(tools)
+        # prompt = getShopAssistantPrompt(tools)
 
-        llm_chain = LLMChain(llm=llm, prompt=prompt)
+        # llm_chain = LLMChain(llm=llm, prompt=prompt)
 
-        output_parser = ShopAssistantOutputParser(verbose=verbose)
+        # output_parser = ShopAssistantOutputParser(verbose=verbose)
 
-        shop_assistant_with_tools = LLMSingleActionAgent(
-            llm_chain=llm_chain,
-            output_parser=output_parser,
-            stop=["\nObservation:"],
-            allowed_tools=tool_names,
-            verbose=verbose,
-            max_iterations=max_iterations,
+        # shop_assistant_with_tools = LLMSingleActionAgent(
+        #     llm_chain=llm_chain,
+        #     output_parser=output_parser,
+        #     stop=["\nObservation:"],
+        #     allowed_tools=tool_names,
+        #     verbose=verbose,
+        #     max_iterations=max_iterations,
 
-        )
+        # )
 
         shop_assistant_executor = initialize_agent(
             agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,

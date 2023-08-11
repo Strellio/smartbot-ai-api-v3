@@ -15,6 +15,10 @@ from pymongo import MongoClient
 
 
 from app.agents.tickets.create.agent import OrderTicketAgent
+
+
+from app.agents.tickets.status.agent import TicketStatusAgent
+
 from app.loaders.shopify import ShopifyLoader
 
 
@@ -29,8 +33,8 @@ index_name = "products-retriever"
 
 
 def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
-    shpify_loader = ShopifyLoader(domain=business.get("shop").get("external_platform_domain"),
-                                  access_token=business.get("shop").get("external_access_token"), resource="products")
+    # shpify_loader = ShopifyLoader(domain=business.get("shop").get("external_platform_domain"),
+    #                               access_token=business.get("shop").get("external_access_token"), resource="products")
 
     # index = VectorstoreIndexCreator(
     #     vectorstore_cls=Redis, vectorstore_kwargs={"index_name": "store-products", "redis_url": f"{getenv('REDIS_URL')}"}).from_loaders([shpify_loader])
@@ -55,6 +59,9 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
 def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3):
     order_ticket_agent = OrderTicketAgent.init(llm=llm,
                                                memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
+
+    ticket_status_agent = TicketStatusAgent.init(llm=llm,
+                                                 memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
     knowledge_base = setupProductKnowlegeBase(
         llm=llm, verbose=verbose, business=business)
 
@@ -66,12 +73,22 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
             description="useful for when you need to answer questions about product information",
         ),
         Tool(
-            name="OrderSupportTicket",
+            name="CreateNewSupportTicket",
             func=order_ticket_agent.run,
-            # return_direct=True,
-            description="useful for when you need to create a support ticket for an issue a customer has raised about their order"
+            return_direct=True,
+            description="useful for when you need to create a support ticket for an issue a customer has raised about their order. This is when a customer report an issue to you"
+
+        ),
+        Tool(
+            name="CheckStatusOfCreatedSupportTicket",
+            func=ticket_status_agent.run,
+            return_direct=True,
+            description="useful for when you need to check the status of a support ticket or follow up to get the status of the support ticket. This is when a customer ask you about the status of a ticket or an update about an issue they have already reported"
 
         )
+
+
+
 
 
     ]
