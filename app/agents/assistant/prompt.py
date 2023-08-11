@@ -44,9 +44,9 @@ Thought: Do I need to use a tool? Yes Action: the action to take, should be one 
 When you have a response to say to the customer, or if you do not need to use a tool, or if the tool did not help, you MUST use the format:
 Thought: Do I need to use a tool? No Assistant:[your response here, if previously used a tool, rephrase latest observation, if unable to find the answer, tell the customer]
 
+You must not act as the Customer but as an Assistant only!
 
-You must respond according to the previous conversation history
-Only generate one response at a time and act as a Assistant only!
+You must not respond to yourself.
 
 Previous conversation history:
 {chat_history}
