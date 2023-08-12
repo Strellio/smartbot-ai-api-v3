@@ -1,13 +1,12 @@
 from os import getenv
-from langchain.agents import load_tools, Tool
+from typing import Optional, Type
+from pydantic import BaseModel
+from langchain.tools import BaseTool, Tool
 from langchain.chat_models import ChatOpenAI
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import FAISS
-
 from langchain.embeddings import OpenAIEmbeddings
-
-
 from langchain.vectorstores import Redis, MongoDBAtlasVectorSearch
 
 from langchain.vectorstores import mongodb_atlas
@@ -21,6 +20,11 @@ from app.agents.tickets.status.agent import TicketStatusAgent
 
 from app.loaders.shopify import ShopifyLoader
 
+from langchain.callbacks.manager import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
+
 
 # initialize MongoDB python client
 client = MongoClient(
@@ -30,6 +34,29 @@ db_name = "smart-store-wis"
 collection_name = "products-store"
 collection = client[db_name][collection_name]
 index_name = "products-retriever"
+
+
+class HumanHandoffToolInput(BaseModel):
+    question: Optional[str] = None
+
+
+class HumanHandoffTool(BaseTool):
+    name = "HumanHandoff"
+    description = "useful for when you need to let a customer talk to a human"
+    args_schema: Type[BaseModel] = HumanHandoffToolInput
+    return_direct = True
+
+    def _run(
+        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return "You can now to one of our live agents to get help with your math problem."
+
+    async def _arun(
+        self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool asynchronously."""
+        raise NotImplementedError("Calculator does not support async")
 
 
 def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
@@ -85,7 +112,8 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
             return_direct=True,
             description="useful for when you need to check the status of a support ticket or follow up to get the status of the support ticket. This is when a customer ask you about the status of a ticket or an update about an issue they have already reported"
 
-        )
+        ),
+        HumanHandoffTool(),
 
 
 
