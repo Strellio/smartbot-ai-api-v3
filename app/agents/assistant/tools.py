@@ -42,15 +42,15 @@ class HumanHandoffToolInput(BaseModel):
 
 class HumanHandoffTool(BaseTool):
     name = "HumanHandoff"
-    description = "useful for when you need to let a customer talk to a human"
+    description = "useful for when you need to handoff the conversation to a human and let the customer talk to a human"
     args_schema: Type[BaseModel] = HumanHandoffToolInput
-    return_direct = True
+    # return_direct = True
 
     def _run(
         self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        return "You can now to one of our live agents to get help with your math problem."
+        return "You can now to one of our live agents as you have requested."
 
     async def _arun(
         self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
