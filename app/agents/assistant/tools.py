@@ -27,8 +27,7 @@ from langchain.callbacks.manager import (
 
 
 # initialize MongoDB python client
-client = MongoClient(
-    "mongodb+srv://wisdom:bp000063@cluster0.pxsne.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient(getenv("MONGODB_ATLAS_URL"))
 
 db_name = "smart-store-wis"
 collection_name = "products-store"
