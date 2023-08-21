@@ -1,19 +1,12 @@
 
-import os
 import re
 import pandas as pd
 from typing import Any, Union
-from langchain.agents.agent import AgentOutputParser, OutputParserException
+from langchain.agents.agent import AgentOutputParser
 from langchain.schema import AgentAction, AgentFinish
-from pydantic import BaseModel
-from app.agents.tickets.create.utils import generateTicketPayload
-from app.services.tickets.create_ticket import createTicket
-
-import requests
-import json
 
 
-class SupportTicketOutputParser(AgentOutputParser):
+class SupportTicketStatusOutputParser(AgentOutputParser):
     customer: Any
     business: Any
     chat_platform: Any
@@ -27,29 +20,16 @@ class SupportTicketOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         print("llm_output", llm_output)
 
-        if ("create_support_ticket" in llm_output):
-            regex = r'create_support_ticket:(\{.*\})'
-            # regex = r'llm_output create_support_ticket:\s*({.*?})\s*(?:,|$)|llm_output create_support_ticket:({.*?})\s*(?:,|$)'
-
+        if ("support_ticket_status" in llm_output):
+            regex = r'support_ticket_status:(.*)'
             match = re.search(regex, llm_output)
-            payloadStr = match.group(1)
+            ticketNumber = match.group(1)
             print("\n")
-            print("payloadStr", payloadStr)
-            payload = json.loads(payloadStr)
-
-            ticketInfo = generateTicketPayload(order_id=payload.get(
-                "orderID"), ticket_type=payload.get("type"), **payload)
-
-            print(self.customer.get("_id"), self.business.get(
-                "_id"), self.chat_platform.get("_id"), self.customer.get("email"))
-
-            result = createTicket(customer_id=self.customer.get("_id"), business_id=self.business.get(
-                "_id"), chat_platform_id=self.chat_platform.get("_id"), email=self.customer.get("email"), **ticketInfo)
-            print("result", result)
+            print("ticketNumber", ticketNumber)
 
             return AgentFinish(
                 {
-                    "output": "I have created a support ticket for you."
+                    "output": f"Your support ticket with number {ticketNumber} is in progress."
                 },
                 llm_output,
             )
@@ -68,7 +48,6 @@ class SupportTicketOutputParser(AgentOutputParser):
         # regex =r"Order Support Ticket Action Input: (.*)"
         match = re.search(regex, llm_output, re.DOTALL)
         if not match:
-            print("no match ticket")
             return AgentFinish(
                 {
                     "output": llm_output

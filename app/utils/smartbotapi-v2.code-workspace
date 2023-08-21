@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "../../../smartbotapi-v2"
+		},
+		{
+			"path": "../../../smartbotv2-dashboard"
+		},
+		{
+			"path": "../../../smartbotv2-widget"
+		},
+		{
+			"path": "../.."
+		}
+	],
+	"settings": {
+		"[python]": {
+			"editor.defaultFormatter": "ms-python.autopep8"
+		},
+		"python.formatting.provider": "none"
+	}
+}
