@@ -8,7 +8,6 @@ from app.services.businesses import getBusinessAndChatPlatform
 from app.services.customers.get_customer import getCustomerId
 from app.utils.llm import getLLM
 from app.utils.memory import getMemory
-from promptwatch import PromptWatch
 
 
 def conversation(input: Input):

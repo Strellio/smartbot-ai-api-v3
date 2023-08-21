@@ -33,19 +33,14 @@ class SupportTicketOutputParser(AgentOutputParser):
 
             match = re.search(regex, llm_output)
             payloadStr = match.group(1)
-            print("\n")
-            print("payloadStr", payloadStr)
+
             payload = json.loads(payloadStr)
 
             ticketInfo = generateTicketPayload(order_id=payload.get(
                 "orderID"), ticket_type=payload.get("type"), **payload)
 
-            print(self.customer.get("_id"), self.business.get(
-                "_id"), self.chat_platform.get("_id"), self.customer.get("email"))
-
             result = createTicket(customer_id=self.customer.get("_id"), business_id=self.business.get(
                 "_id"), chat_platform_id=self.chat_platform.get("_id"), email=self.customer.get("email"), **ticketInfo)
-            print("result", result)
 
             return AgentFinish(
                 {
