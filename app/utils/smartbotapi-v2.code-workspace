@@ -17,6 +17,7 @@
 		"[python]": {
 			"editor.defaultFormatter": "ms-python.autopep8"
 		},
-		"python.formatting.provider": "none"
+		"python.formatting.provider": "none",
+		"compile-hero.disable-compile-files-on-did-save-code": false
 	}
 }

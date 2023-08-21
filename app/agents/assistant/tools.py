@@ -74,9 +74,9 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
         index_name=index_name
     )
 
-    stripe_doc_retriever = vectorstore.as_retriever()
+    product_doc_retriever = vectorstore.as_retriever()
     knowledge_base = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=stripe_doc_retriever, verbose=verbose
+        llm=llm, chain_type="stuff", retriever=product_doc_retriever, verbose=verbose
     )
 
     return knowledge_base
@@ -105,7 +105,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
             name="CreateNewSupportTicket",
             func=order_ticket_agent.run,
             return_direct=True,
-            description="useful for when you need to create a support ticket for an issue a customer has raised about their order. This is when a customer report an issue to you"
+            description="useful for when you need to create a support ticket for an issue a customer has raised about their order. This is when a customer report an issue to you."
 
         ),
         Tool(
