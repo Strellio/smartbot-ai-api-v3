@@ -28,7 +28,7 @@ class SupportTicketOutputParser(AgentOutputParser):
         print("llm_output", llm_output)
 
         if ("create_support_ticket" in llm_output):
-            regex = r'create_support_ticket:(\{.*\})'
+            regex = r'create_support_ticket:(?:\s?)(\{.*\})'
             # regex = r'llm_output create_support_ticket:\s*({.*?})\s*(?:,|$)|llm_output create_support_ticket:({.*?})\s*(?:,|$)'
 
             match = re.search(regex, llm_output)
