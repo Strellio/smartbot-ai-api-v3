@@ -19,17 +19,13 @@ from app.agents.tickets.create.agent import OrderTicketAgent
 
 
 from app.agents.tickets.status.agent import TicketStatusAgent
+from app.constant import PRODUCT_VECTORSTORE_COLLECTION_NAME, PRODUCT_VECTORSTORE_INDEX_NAME
 
 from app.services.agents.get_business_agents import getBusinessOnlineAgent
 
 
 # initialize MongoDB python client
 client = MongoClient(getenv("MONGODB_ATLAS_URL"))
-
-db_name = "smart-store-wis"
-collection_name = "products-store"
-collection = client[db_name][collection_name]
-index_name = "products-retriever"
 
 
 def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3):
@@ -68,10 +64,13 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
     # index = VectorstoreIndexCreator(
     #     vectorstore_cls=MongoDBAtlasVectorSearch, vectorstore_kwargs={"index_name": index_name, "collection": collection}).from_loaders([shpify_loader])
 
+    db_name = business.get('business_name').replace(" ", "-")
+    collection = client[db_name][PRODUCT_VECTORSTORE_COLLECTION_NAME]
+
     vectorstore = MongoDBAtlasVectorSearch(
         collection=collection,
         embedding=OpenAIEmbeddings(),
-        index_name=index_name
+        index_name=PRODUCT_VECTORSTORE_INDEX_NAME
     )
 
     product_doc_retriever = vectorstore.as_retriever()
@@ -98,7 +97,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
         Tool(
             name="ProductSearch",
             func=knowledge_base.run,
-            # return_direct=True,
+            return_direct=True,
             description="useful for when you need to answer questions about product information",
         ),
         Tool(
