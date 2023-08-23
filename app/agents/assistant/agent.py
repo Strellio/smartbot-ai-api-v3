@@ -49,7 +49,8 @@ class ShopAssistant(BaseModel):
             verbose=verbose,
             max_iterations=max_iterations,
             memory=memory,
-            handle_parsing_errors="Check your output and make sure it conforms!"
+            handle_parsing_errors="Check your output and make sure it conforms!",
+            early_stopping_method="generate"
             # agent_kwargs={"output_parser": output_parser}
         )
 
