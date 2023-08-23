@@ -1,0 +1,2 @@
+PRODUCT_VECTORSTORE_COLLECTION_NAME = "products-store"
+PRODUCT_VECTORSTORE_INDEX_NAME = "products-retriever"
