@@ -6,7 +6,7 @@ from pydantic import Field, BaseModel
 from langchain.agents import LLMSingleActionAgent, AgentExecutor
 from app.agents.human_hand_off.parser import HumanHandOffOutputParser
 from app.agents.human_hand_off.prompt import human_handoff_prompt
-from app.agents.human_hand_off.tools import hand_off_tools_names,  handoff_tools
+from app.agents.human_hand_off.tools import HumanHandoffTool
 
 
 class HumanHandoffAgent(BaseModel):
@@ -15,6 +15,13 @@ class HumanHandoffAgent(BaseModel):
 
     @classmethod
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3) -> "HumanHandoffAgent":
+        handoff_tools = [
+            HumanHandoffTool(
+                customer=customer
+            )
+        ]
+        hand_off_tools_names = [tool.name for tool in handoff_tools]
+
         llm_chain = LLMChain(
             llm=llm, prompt=human_handoff_prompt)
 
@@ -37,4 +44,5 @@ class HumanHandoffAgent(BaseModel):
         return self(human_handoff_agent=human_handoff_agent, llm_chain=llm_chain)
 
     def run(self, input: str):
+        print("handoff input is ", input)
         return self.human_handoff_agent.run(input)

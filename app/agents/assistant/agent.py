@@ -21,41 +21,42 @@ class ShopAssistant(BaseModel):
     @classmethod
     def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, business, chat_platform, customer, verbose=False, max_iterations=3):
 
-        tools = getTools(llm=llm, memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
+        tools = getTools(llm=llm, memory=ReadOnlySharedMemory(memory=memory), verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
                          max_iterations=max_iterations)
 
-        # tool_names = [tool.name for tool in tools]
+        tool_names = [tool.name for tool in tools]
 
-        # prompt = getShopAssistantPrompt(tools)
+        prompt = getShopAssistantPrompt(tools)
 
-        # llm_chain = LLMChain(llm=llm, prompt=prompt)
+        llm_chain = LLMChain(llm=llm, prompt=prompt)
 
-        # output_parser = ShopAssistantOutputParser(verbose=verbose)
+        output_parser = ShopAssistantOutputParser(verbose=verbose)
 
-        # shop_assistant_with_tools = LLMSingleActionAgent(
-        #     llm_chain=llm_chain,
-        #     output_parser=output_parser,
-        #     stop=["\nObservation:"],
-        #     allowed_tools=tool_names,
-        #     verbose=verbose,
-        #     max_iterations=max_iterations,
-
-        # )
-
-        shop_assistant_executor = initialize_agent(
-            agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
-            tools=tools,
-            llm=llm,
+        shop_assistant_with_tools = LLMSingleActionAgent(
+            llm_chain=llm_chain,
+            output_parser=output_parser,
+            stop=["\nObservation:"],
+            allowed_tools=tool_names,
             verbose=verbose,
             max_iterations=max_iterations,
-            memory=memory,
-            handle_parsing_errors="Check your output and make sure it conforms!"
-            # agent_kwargs={"output_parser": output_parser}
+
         )
 
-        # shop_assistant_executor = AgentExecutor.from_agent_and_tools(
-        #     agent=shop_assistant_with_tools, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=memory
+        # shop_assistant_executor = initialize_agent(
+        #     agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+        #     tools=tools,
+        #     llm=llm,
+        #     verbose=verbose,
+        #     max_iterations=max_iterations,
+        #     memory=memory,
+        #     handle_parsing_errors="Check your output and make sure it conforms!",
+        #     early_stopping_method="generate"
+        #     # agent_kwargs={"output_parser": output_parser}
         # )
+
+        shop_assistant_executor = AgentExecutor.from_agent_and_tools(
+            agent=shop_assistant_with_tools, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=memory
+        )
 
         return self(shop_assistant_executor=shop_assistant_executor, memory=memory, business=business, max_iterations=max_iterations)
 

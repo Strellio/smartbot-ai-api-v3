@@ -12,54 +12,49 @@ from langchain.vectorstores import Redis, MongoDBAtlasVectorSearch
 from langchain.vectorstores import mongodb_atlas
 from pymongo import MongoClient
 from app.agents.human_hand_off.agent import HumanHandoffAgent
+from app.agents.human_hand_off.tools import HumanHandoffTool
 
 
 from app.agents.tickets.create.agent import OrderTicketAgent
 
 
 from app.agents.tickets.status.agent import TicketStatusAgent
+from app.constant import PRODUCT_VECTORSTORE_COLLECTION_NAME, PRODUCT_VECTORSTORE_INDEX_NAME
 
-from app.loaders.shopify import ShopifyLoader
-
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForToolRun,
-    CallbackManagerForToolRun,
-)
+from app.services.agents.get_business_agents import getBusinessOnlineAgent
 
 
 # initialize MongoDB python client
 client = MongoClient(getenv("MONGODB_ATLAS_URL"))
 
-db_name = "smart-store-wis"
-collection_name = "products-store"
-collection = client[db_name][collection_name]
-index_name = "products-retriever"
 
+def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3):
 
-# class HumanHandoffToolInput(BaseModel):
-#     question: Optional[str] = None
+    onlineAgent = getBusinessOnlineAgent(businessId=business.get("_id"))
 
-
-# class HumanHandoffTool(BaseTool):
-#     name = "HumanHandoff"
-#     description = "useful for when you need to handoff the conversation to a human and let the customer talk to a human"
-#     args_schema: Type[BaseModel] = HumanHandoffToolInput
-#     return_direct = True
-
-#     def _run(
-#         self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
-#     ) -> str:
-#         """Use the tool."""
-#         return "There are currently no live agent available at the moment. Will you still want me to proceed handoff the conversation?"
-
-#     async def _arun(
-#         self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-#     ) -> str:
-#         """Use the tool asynchronously."""
-#         raise NotImplementedError("Calculator does not support async")
+    if onlineAgent is not None:
+        return HumanHandoffTool(customer=customer)
+    else:
+        human_handoff_agent = HumanHandoffAgent.init(
+            llm=llm,
+            memory=memory,
+            verbose=verbose,
+            business=business,
+            chat_platform=chat_platform,
+            customer=customer,
+            max_iterations=max_iterations
+        )
+        return Tool(
+            name="HandOffConversationToHuman",
+            func=human_handoff_agent.run,
+            return_direct=True,
+            description="useful for when you need to hand off the conversation to a human and let the customer talk to a human"
+        )
 
 
 def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
+
+    # get data and saving. botth redis and mongodb
     # shpify_loader = ShopifyLoader(domain=business.get("shop").get("external_platform_domain"),
     #                               access_token=business.get("shop").get("external_access_token"), resource="products")
 
@@ -69,15 +64,18 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
     # index = VectorstoreIndexCreator(
     #     vectorstore_cls=MongoDBAtlasVectorSearch, vectorstore_kwargs={"index_name": index_name, "collection": collection}).from_loaders([shpify_loader])
 
+    db_name = business.get('business_name').replace(" ", "-")
+    collection = client[db_name][PRODUCT_VECTORSTORE_COLLECTION_NAME]
+
     vectorstore = MongoDBAtlasVectorSearch(
         collection=collection,
         embedding=OpenAIEmbeddings(),
-        index_name=index_name
+        index_name=PRODUCT_VECTORSTORE_INDEX_NAME
     )
 
-    stripe_doc_retriever = vectorstore.as_retriever()
+    product_doc_retriever = vectorstore.as_retriever()
     knowledge_base = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=stripe_doc_retriever, verbose=verbose
+        llm=llm, chain_type="stuff", retriever=product_doc_retriever, verbose=verbose
     )
 
     return knowledge_base
@@ -90,8 +88,8 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
     ticket_status_agent = TicketStatusAgent.init(llm=llm,
                                                  memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
 
-    human_handoff_agent = HumanHandoffAgent.init(llm=llm,
-                                                 memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
+    human_handoff_tool = getHumanHandOffTool(llm=llm,
+                                             memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
     knowledge_base = setupProductKnowlegeBase(
         llm=llm, verbose=verbose, business=business)
 
@@ -99,14 +97,14 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
         Tool(
             name="ProductSearch",
             func=knowledge_base.run,
-            # return_direct=True,
+            return_direct=True,
             description="useful for when you need to answer questions about product information",
         ),
         Tool(
             name="CreateNewSupportTicket",
             func=order_ticket_agent.run,
             return_direct=True,
-            description="useful for when you need to create a support ticket for an issue a customer has raised about their order. This is when a customer report an issue to you"
+            description="useful for when you need to create a support ticket for an issue a customer has raised about their order. This is when a customer report an issue to you."
 
         ),
         Tool(
@@ -117,13 +115,8 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
 
         ),
 
-        Tool(
-            name="HandOffConversationToHuman",
-            func=human_handoff_agent.run,
-            return_direct=True,
-            description="useful for when you need to handoff the conversation to a human and let the customer talk to a human"
+        human_handoff_tool
 
-        )
     ]
 
     return tools
