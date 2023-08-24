@@ -44,4 +44,5 @@ class HumanHandoffAgent(BaseModel):
         return self(human_handoff_agent=human_handoff_agent, llm_chain=llm_chain)
 
     def run(self, input: str):
+        print("handoff input is ", input)
         return self.human_handoff_agent.run(input)
