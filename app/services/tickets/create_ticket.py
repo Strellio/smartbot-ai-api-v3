@@ -5,8 +5,8 @@ from enum import Enum
 
 
 class TICKET_PRIORITY_ENUM(Enum):
-    HIGH = 'high',
-    LOW = 'low',
+    HIGH = 'high'
+    LOW = 'low'
     MEDIUM = 'medium'
 
 
