@@ -30,7 +30,7 @@ class ShopAssistantOutputParser(AgentOutputParser):
             # TODO - this is not entirely reliable, sometimes results in an error.
             return AgentFinish(
                 {
-                    "output":   "I apologize, I was unable to find the answer to your question. Is there anything else I can help with?"
+                    "output":  text  # "I apologize, I was unable to find the answer to your question. Is there anything else I can help with?"
                 },
                 text,
             )
