@@ -5,7 +5,7 @@ from app.agents.assistant.agent import ShopAssistant
 
 from app.models import Input
 from app.services.businesses import getBusinessAndChatPlatform
-from app.services.customers.get_customer import getCustomerId
+from app.services.customers.get_customer import getCustomerByPlatform
 from app.utils.llm import getLLM
 from app.utils.memory import getMemory
 
@@ -16,7 +16,8 @@ def conversation(input: Input):
                        memory_key="chat_history")
 
     business, chat_platform = getBusinessAndChatPlatform(input.metadata)
-    customer = getCustomerId(input.sender)
+    customer = getCustomerByPlatform(
+        input.sender, chat_platform.get("platform"))
 
     shop_assistant = ShopAssistant.init(
         llm=llm, memory=memory, business=business, chat_platform=chat_platform, customer=customer, verbose=True)
