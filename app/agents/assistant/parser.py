@@ -1,10 +1,31 @@
 
 import re
-import pandas as pd
 from typing import Union
 from langchain.agents.agent import AgentOutputParser, OutputParserException
 from langchain.schema import AgentAction, AgentFinish
 from langchain.agents.conversational.prompt import FORMAT_INSTRUCTIONS
+
+
+def remove_tags(text_with_tags):
+    # Remove lines containing "Tags:"
+    text_without_tags = re.sub(r'\n\s*-?\s*Tags:.*\n', '\n', text_with_tags)
+    return text_without_tags.strip()
+
+
+def markdown_to_text(markdown_string):
+    # Remove Markdown link syntax and keep only the URLs
+    markdown_string = re.sub(r'\[.*?\]\((.*?)\)', r'\1', markdown_string)
+
+    # Remove Markdown emphasis and bold syntax
+    markdown_string = re.sub(r'\*{1,2}', '', markdown_string)
+
+    return markdown_string.strip()
+
+
+def format_response(response: str):
+    response_without_tags = remove_tags(response)
+    md_to_text = markdown_to_text(response_without_tags)
+    return md_to_text
 
 
 class ShopAssistantOutputParser(AgentOutputParser):
@@ -20,8 +41,10 @@ class ShopAssistantOutputParser(AgentOutputParser):
             print(text)
             print("-------")
         if f"{self.ai_prefix}:" in text:
+            response = format_response(text.split(
+                f"{self.ai_prefix}:")[-1].strip())
             return AgentFinish(
-                {"output": text.split(f"{self.ai_prefix}:")[-1].strip()}, text
+                {"output": response}, text
             )
         regex = r"(.*?)\nAction:(.*?)\nAction Input: (.*)"
         match = re.search(regex, text)
@@ -30,7 +53,7 @@ class ShopAssistantOutputParser(AgentOutputParser):
             # TODO - this is not entirely reliable, sometimes results in an error.
             return AgentFinish(
                 {
-                    "output":  text  # "I apologize, I was unable to find the answer to your question. Is there anything else I can help with?"
+                    "output":  "I apologize, I was unable to find the answer to your question. Can you reprase it or is there anything else I can help with?"
                 },
                 text,
             )
