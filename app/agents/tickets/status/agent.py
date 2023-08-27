@@ -13,7 +13,7 @@ class TicketStatusAgent(BaseModel):
     llm_chain: Union[LLMChain, None] = Field(...)
 
     @classmethod
-    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3) -> "TicketStatusAgent":
+    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10) -> "TicketStatusAgent":
         llm_chain = LLMChain(
             llm=llm, prompt=ticket_status_prompt)
 

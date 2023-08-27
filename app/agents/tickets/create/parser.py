@@ -44,7 +44,7 @@ class SupportTicketOutputParser(AgentOutputParser):
 
             return AgentFinish(
                 {
-                    "output": f"I have created a support ticket for you. Our team will get in touch with you to resolve your {ticketInfo.get('title')} request"
+                    "output": f"I have created a support ticket for you. Your support ticket number is {result.get('ticket_number')}. Our team will get in touch with you to resolve your {ticketInfo.get('title')} request"
                 },
                 llm_output,
             )
@@ -56,6 +56,15 @@ class SupportTicketOutputParser(AgentOutputParser):
                 # It is not recommended to try anything else at the moment :)
                 return_values={"output": llm_output.split(
                     "Assistant:")[-1].strip()},
+                log=llm_output,
+            )
+        # Check if agent should finish
+        if "AI:" in llm_output:
+            return AgentFinish(
+                # Return values is generally always a dictionary with a single `output` key
+                # It is not recommended to try anything else at the moment :)
+                return_values={"output": llm_output.split(
+                    "AI:")[-1].strip()},
                 log=llm_output,
             )
         # Parse out the action and action input

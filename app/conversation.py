@@ -20,7 +20,7 @@ def conversation(input: Input):
         input.sender, chat_platform.get("platform"))
 
     shop_assistant = ShopAssistant.init(
-        llm=llm, memory=memory, business=business, chat_platform=chat_platform, customer=customer, verbose=True)
+        llm=llm, memory=memory, business=business, chat_platform=chat_platform, customer=customer, verbose=True, user_input=input.message)
     # with PromptWatch(api_key=os.getenv("PROMPTWATCH_API_KEY")) as pw:
     output = shop_assistant.run(input=input.message)
     return output

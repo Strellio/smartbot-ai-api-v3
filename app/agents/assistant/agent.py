@@ -19,10 +19,10 @@ class ShopAssistant(BaseModel):
     shop_assistant_executor: Union[AgentExecutor, None] = Field(...)
 
     @classmethod
-    def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, business, chat_platform, customer, verbose=False, max_iterations=3):
+    def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, business, chat_platform, customer, verbose=False, max_iterations=10, user_input=''):
 
         tools = getTools(llm=llm, memory=ReadOnlySharedMemory(memory=memory), verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
-                         max_iterations=max_iterations)
+                         max_iterations=max_iterations, user_input=user_input)
 
         tool_names = [tool.name for tool in tools]
 

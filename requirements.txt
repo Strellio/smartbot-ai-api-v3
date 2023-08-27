@@ -13,3 +13,4 @@ chromadb
 faiss-cpu 
 datetime
 promptwatch
+nanoid

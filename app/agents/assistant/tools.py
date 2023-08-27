@@ -28,7 +28,7 @@ from app.services.agents.get_business_agents import getBusinessOnlineAgent
 client = MongoClient(getenv("MONGODB_ATLAS_URL"))
 
 
-def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3):
+def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input=''):
 
     onlineAgent = getBusinessOnlineAgent(businessId=business.get("_id"))
 
@@ -42,7 +42,8 @@ def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platfo
             business=business,
             chat_platform=chat_platform,
             customer=customer,
-            max_iterations=max_iterations
+            max_iterations=max_iterations,
+            user_input=user_input
         )
         return Tool(
             name="HandOffConversationToHuman",
@@ -81,15 +82,15 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
     return knowledge_base
 
 
-def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3):
+def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_input, verbose=False, max_iterations=10):
     order_ticket_agent = OrderTicketAgent.init(llm=llm,
-                                               memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
+                                               memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
 
     ticket_status_agent = TicketStatusAgent.init(llm=llm,
                                                  memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
 
     human_handoff_tool = getHumanHandOffTool(llm=llm,
-                                             memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
+                                             memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
     knowledge_base = setupProductKnowlegeBase(
         llm=llm, verbose=verbose, business=business)
 
