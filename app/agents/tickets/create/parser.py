@@ -44,7 +44,7 @@ class SupportTicketOutputParser(AgentOutputParser):
 
             return AgentFinish(
                 {
-                    "output": "I have created a support ticket for you."
+                    "output": f"I have created a support ticket for you. Our team will get in touch with you to resolve your {ticketInfo.get('title')} request"
                 },
                 llm_output,
             )

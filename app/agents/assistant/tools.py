@@ -97,7 +97,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose
         Tool(
             name="ProductSearch",
             func=knowledge_base.run,
-            return_direct=True,
+            return_direct=False,
             description="useful for when you need to answer questions about product information",
         ),
         Tool(
