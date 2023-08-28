@@ -87,7 +87,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_in
                                                memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
 
     ticket_status_agent = TicketStatusAgent.init(llm=llm,
-                                                 memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations)
+                                                 memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
 
     human_handoff_tool = getHumanHandOffTool(llm=llm,
                                              memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)

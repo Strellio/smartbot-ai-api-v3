@@ -11,9 +11,10 @@ from app.agents.tickets.status.prompt import ticket_status_prompt
 class TicketStatusAgent(BaseModel):
     ticket_status_agent: Union[AgentExecutor, None] = Field(...)
     llm_chain: Union[LLMChain, None] = Field(...)
+    user_input: str
 
     @classmethod
-    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10) -> "TicketStatusAgent":
+    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, user_input, verbose=False, max_iterations=10) -> "TicketStatusAgent":
         llm_chain = LLMChain(
             llm=llm, prompt=ticket_status_prompt)
 
@@ -34,7 +35,7 @@ class TicketStatusAgent(BaseModel):
 
         )
 
-        return self(ticket_status_agent=ticket_status_agent, llm_chain=llm_chain)
+        return self(ticket_status_agent=ticket_status_agent, llm_chain=llm_chain, user_input=user_input)
 
     def run(self, input: str):
-        return self.ticket_status_agent.run(input)
+        return self.ticket_status_agent.run(self.user_input)

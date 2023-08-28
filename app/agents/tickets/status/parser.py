@@ -4,6 +4,9 @@ import pandas as pd
 from typing import Any, Union
 from langchain.agents.agent import AgentOutputParser
 from langchain.schema import AgentAction, AgentFinish
+from app.agents.tickets.status.utils import generateTicketResponseBaseOnColumnID
+
+from app.services.tickets.get_ticket import getTicket
 
 
 class SupportTicketStatusOutputParser(AgentOutputParser):
@@ -27,11 +30,19 @@ class SupportTicketStatusOutputParser(AgentOutputParser):
             print("\n")
             print("ticketNumber", ticketNumber)
 
+            ticket = getTicket(self.customer.get("_id"), ticketNumber)
+
+            if not ticket:
+                return AgentFinish({
+                    "output": f"I could not find any support ticket of yours with number {ticketNumber}. Kindly recheck and try again"
+                },
+                    llm_output)
+
             return AgentFinish(
                 {
-                    "output": f"Your support ticket with number {ticketNumber} is in progress."
+                    "output": generateTicketResponseBaseOnColumnID(ticket)
                 },
-                llm_output,
+                llm_output
             )
 
         # Check if agent should finish
@@ -41,6 +52,14 @@ class SupportTicketStatusOutputParser(AgentOutputParser):
                 # It is not recommended to try anything else at the moment :)
                 return_values={"output": llm_output.split(
                     "Assistant:")[-1].strip()},
+                log=llm_output,
+            )
+        if "AI:" in llm_output:
+            return AgentFinish(
+                # Return values is generally always a dictionary with a single `output` key
+                # It is not recommended to try anything else at the moment :)
+                return_values={"output": llm_output.split(
+                    "AI:")[-1].strip()},
                 log=llm_output,
             )
         # Parse out the action and action input
