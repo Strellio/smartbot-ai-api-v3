@@ -12,12 +12,11 @@ from app.utils.memory import getMemory
 
 def conversation(input: Input):
     llm = getLLM()
-    memory = getMemory(session_id=input.sender,
-                       memory_key="chat_history")
-
     business, chat_platform = getBusinessAndChatPlatform(input.metadata)
     customer = getCustomerByPlatform(
         input.sender, chat_platform.get("platform"))
+    memory = getMemory(session_id=input.sender, db_name=business.get("account_name"),
+                       memory_key="chat_history")
 
     shop_assistant = ShopAssistant.init(
         llm=llm, memory=memory, business=business, chat_platform=chat_platform, customer=customer, verbose=True, user_input=input.message)

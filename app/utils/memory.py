@@ -3,13 +3,13 @@ from langchain.memory.chat_message_histories import RedisChatMessageHistory, Mon
 import os
 
 
-def getMemory(session_id: str, memory_key: str):
+def getMemory(session_id: str, db_name: str, memory_key: str):
     # message_history = RedisChatMessageHistory(
     #     url=f"{os.environ.get('REDIS_URL')}/2", ttl=600, session_id=session_id
     # )
 
     message_history = MongoDBChatMessageHistory(
-        connection_string=os.environ.get("DATABASE_URL"), database_name=os.environ.get("DATABASE_NAME"), collection_name="chat_message_history", session_id=session_id
+        connection_string=os.environ.get("DATABASE_URL"), database_name=db_name, collection_name="chat_message_history", session_id=session_id
     )
 
     memory = ConversationBufferMemory(
