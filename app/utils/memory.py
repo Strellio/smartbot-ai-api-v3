@@ -13,6 +13,6 @@ def getMemory(session_id: str, db_name: str, memory_key: str):
     )
 
     memory = ConversationBufferMemory(
-        memory_key=memory_key, chat_memory=message_history, k=20, return_messages=False, human_prefix="Customer"
+        memory_key=memory_key, chat_memory=message_history, k=15, return_messages=False, human_prefix="Customer"
     )
     return memory
