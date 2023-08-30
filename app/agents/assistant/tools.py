@@ -1,9 +1,5 @@
-from os import getenv
-from typing import Optional, Type
-from pydantic import BaseModel
-from langchain.tools import BaseTool, Tool
+from langchain.tools import Tool
 from langchain.chat_models import ChatOpenAI
-from langchain.indexes import VectorstoreIndexCreator
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
@@ -12,9 +8,11 @@ from langchain.vectorstores import Redis, MongoDBAtlasVectorSearch
 from langchain.text_splitter import CharacterTextSplitter
 
 from langchain.vectorstores import FAISS
+from app.agents.order.track.agent import OrderTrackAgent
 
-from langchain.vectorstores import mongodb_atlas
-from pymongo import MongoClient
+
+from app.lib.db import atlasClient
+
 from app.agents.human_hand_off.agent import HumanHandoffAgent
 from app.agents.human_hand_off.tools import HumanHandoffTool
 
@@ -26,10 +24,6 @@ from app.agents.tickets.status.agent import TicketStatusAgent
 from app.constant import PRODUCT_VECTORSTORE_COLLECTION_NAME, PRODUCT_VECTORSTORE_INDEX_NAME
 
 from app.services.agents.get_business_agents import getBusinessOnlineAgent
-
-
-# initialize MongoDB python client
-client = MongoClient(getenv("MONGODB_ATLAS_URL"))
 
 
 def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input=''):
@@ -121,8 +115,8 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
     # index = VectorstoreIndexCreator(
     #     vectorstore_cls=MongoDBAtlasVectorSearch, vectorstore_kwargs={"index_name": index_name, "collection": collection}).from_loaders([shpify_loader])
 
-    db_name = business.get('business_name').replace(" ", "-")
-    collection = client[db_name][PRODUCT_VECTORSTORE_COLLECTION_NAME]
+    db_name = business.get('account_name')
+    collection = atlasClient[db_name][PRODUCT_VECTORSTORE_COLLECTION_NAME]
 
     vectorstore = MongoDBAtlasVectorSearch(
         collection=collection,
@@ -152,6 +146,9 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_in
     offers_knowledge_base = getOffersAndPromos(
         llm=llm, verbose=verbose, business=business)
 
+    order_tracking_agent = OrderTrackAgent.init(llm=llm,
+                                                memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
+
     tools = [
         Tool(
             name="ProductSearch",
@@ -165,6 +162,12 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_in
             return_direct=True,
             description="useful for when you need to create a support ticket for an issue a customer has raised about their order. This is when a customer report an issue to you."
 
+        ),
+        Tool(
+            name="CheckOrderStatusAndOrderTracking",
+            func=order_tracking_agent.run,
+            return_direct=True,
+            description="useful for when you need to check the status of an order, track an order and answer questions about an order"
         ),
         Tool(
             name="CheckStatusOfCreatedSupportTicket",
