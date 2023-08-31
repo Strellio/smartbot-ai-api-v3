@@ -63,8 +63,7 @@ class ShopAssistant(BaseModel):
     def run(self, input):
         ouput = self.shop_assistant_executor.run(
             input=input,
-            chat_history=self.memory.load_memory_variables({})[
-                "chat_history"],
+            chat_history=self.memory.load_memory_variables({})["chat_history"],
             # shop_name=self.shop.get("name"),
         )
         return ouput
