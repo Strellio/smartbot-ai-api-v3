@@ -38,4 +38,5 @@ class TicketStatusAgent(BaseModel):
         return self(ticket_status_agent=ticket_status_agent, llm_chain=llm_chain, user_input=user_input)
 
     def run(self, input: str):
+        print("status", self.user_input)
         return self.ticket_status_agent.run(self.user_input)

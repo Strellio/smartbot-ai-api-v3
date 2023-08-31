@@ -166,7 +166,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_in
         Tool(
             name="CheckOrderStatusAndOrderTracking",
             func=order_tracking_agent.run,
-            return_direct=True,
+            return_direct=False,
             description="useful for when you need to check the status of an order, track an order and answer questions about an order"
         ),
         Tool(
