@@ -173,7 +173,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_in
             name="CheckStatusOfCreatedSupportTicket",
             func=ticket_status_agent.run,
             return_direct=True,
-            description="useful for when you need to check the status of a support ticket or follow up to get the status of the support ticket. This is when a customer ask you about the status of a ticket or an update about an issue they have already reported"
+            description="useful for when you need to check the status of a support ticket or follow up to get the status of the support ticket"
 
         ),
         Tool(

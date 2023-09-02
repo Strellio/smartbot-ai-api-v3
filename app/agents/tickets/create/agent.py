@@ -38,5 +38,4 @@ class OrderTicketAgent(BaseModel):
         return self(order_ticket_agent=order_ticket_agent, llm_chain=llm_chain, user_input=user_input)
 
     def run(self, input: str):
-        print("user input", self.user_input)
-        return self.order_ticket_agent.run(self.user_input)
+        return self.order_ticket_agent.run(input)
