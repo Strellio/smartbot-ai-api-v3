@@ -45,4 +45,4 @@ class HumanHandoffAgent(BaseModel):
         return self(human_handoff_agent=human_handoff_agent, llm_chain=llm_chain, user_input=user_input)
 
     def run(self, input: str):
-        return self.human_handoff_agent.run(input)
+        return self.human_handoff_agent.run(self.user_input)

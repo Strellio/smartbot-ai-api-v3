@@ -160,7 +160,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_in
             name="CreateNewSupportTicket",
             func=order_ticket_agent.run,
             return_direct=True,
-            description="useful for when you need to create a support ticket for an issue a customer has raised about their order. This is when a customer report an issue to you."
+            description="useful for when you need to create a support ticket for an issue a customer is reporting about their order. This is when a customer report an issue to you."
 
         ),
         Tool(
@@ -173,7 +173,7 @@ def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_in
             name="CheckStatusOfCreatedSupportTicket",
             func=ticket_status_agent.run,
             return_direct=True,
-            description="useful for when you need to check the status of a support ticket or follow up to get the status of the support ticket"
+            description="useful for when you need to check the status of a support ticket to know whether it has been resolved or not"
 
         ),
         Tool(
