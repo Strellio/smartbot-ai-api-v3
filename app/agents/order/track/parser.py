@@ -23,12 +23,11 @@ def markdown_to_text(markdown_string):
 
 
 def format_response(response: str):
-    response_without_tags = remove_tags(response)
-    md_to_text = markdown_to_text(response_without_tags)
+    md_to_text = markdown_to_text(response)
     return md_to_text
 
 
-class ShopAssistantOutputParser(AgentOutputParser):
+class OrderTrackOutputParser(AgentOutputParser):
     ai_prefix: str = "Assistant"  # change for salesperson_name
     verbose: bool = False
 
@@ -65,4 +64,4 @@ class ShopAssistantOutputParser(AgentOutputParser):
 
     @property
     def _type(self) -> str:
-        return "shop-assistant"
+        return "order-track"

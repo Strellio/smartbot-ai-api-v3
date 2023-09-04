@@ -1,51 +1,10 @@
-
-from enum import Enum
-
-from app.services.tickets.create_ticket import TICKET_PRIORITY_ENUM
-
-
-class TicketType(Enum):
-    ORDER_CANCELLATION = "order-cancel"
-    ORDER_RETURN = "order-return"
-    ORDER_REFUND = "order-refund"
-    ORDER_DELAY = "order-delay"
-    ORDER_RESCHEDULE = "order-reschedule"
-    ORDER_ADDRESS_CHANGE = "order-address-change"
-    ORDER_INCOMPLETE = "order-incomplete"
-    ORDER_PAYMENT_ISSUE = "order-payment-issue"
-    ORDER_PAYMENT_CHANGE = "order-payment-change"
-    ORDER_INCORRECT = "order-incorrect"
-    ORDER_DELIVERY_ISSUE = "order-delivery-issue"
-
-
-def generateTicketPayload(order_id: str, ticket_type: TicketType, **kwargs):
-    ticket_descriptions = {
-        TicketType.ORDER_CANCELLATION.value: lambda kwargs:  ("Order Cancellation", f"Order {order_id} cancellation due to {kwargs['cancellationReason']}.", TICKET_PRIORITY_ENUM.MEDIUM),
-        TicketType.ORDER_RETURN.value: lambda kwargs:  ("Order Return", f"Order {order_id} return due to {kwargs['returnReason']}.", TICKET_PRIORITY_ENUM.MEDIUM),
-        TicketType.ORDER_REFUND.value: lambda kwargs:  ("Order Refund", f"Order {order_id} refund due to {kwargs['refundReason']}.", TICKET_PRIORITY_ENUM.MEDIUM),
-        TicketType.ORDER_DELAY.value: lambda kwargs:  ("Order Delivery Delay", f"Order {order_id} delivery delay. Expected delivery date: {kwargs['pastDeliveryDate']}.", TICKET_PRIORITY_ENUM.MEDIUM),
-        TicketType.ORDER_RESCHEDULE.value: lambda kwargs:  ("Order Delivery Reschedule", f"Order {order_id} delivery rescheduled to {kwargs['newDeliveryDate']} due to {kwargs['rescheduleReason']}.", TICKET_PRIORITY_ENUM.HIGH),
-        TicketType.ORDER_ADDRESS_CHANGE.value: lambda kwargs:  ("Order Delivery Address Change", f"Order {order_id} delivery address changed to {kwargs['newDeliveryAddress']}.", TICKET_PRIORITY_ENUM.HIGH),
-        TicketType.ORDER_INCOMPLETE.value: lambda kwargs:  ("Incomplete Order", f"Order {order_id} is incomplete due to missing items: {kwargs['missingItems']}.", TICKET_PRIORITY_ENUM.HIGH),
-        TicketType.ORDER_PAYMENT_ISSUE.value: lambda kwargs:  ("Order Payment Issue", f"Order {order_id} payment issue with {kwargs['paymentMethod']}.", TICKET_PRIORITY_ENUM.HIGH),
-        TicketType.ORDER_PAYMENT_CHANGE.value: lambda kwargs:  ("Order Payment Method Change", f"Order {order_id} payment method changed to {kwargs['newPaymentMethod']} due to {kwargs['paymentMethodChangeReason']}.", TICKET_PRIORITY_ENUM.MEDIUM),
-        TicketType.ORDER_INCORRECT.value: lambda kwargs:  ("Incorrect Order", f"Order {order_id} is incorrect. Incorrect items: {kwargs['incorrectItems']}."),
-        TicketType.ORDER_DELIVERY_ISSUE.value: lambda kwargs:  (
-            "Order Delivery Issue", f"Order {order_id} has a delivery issue: {kwargs['deliveryIssue']}.", TICKET_PRIORITY_ENUM.MEDIUM),
+def generateTicketResponseBaseOnColumnID(ticket):
+    map_column_id_status = {
+        1: f"Your {ticket.get('title')}  support ticket is yet to be resolved. Kindly exercise some patience for us to resolve this as soon as possible",
+        2: f"Our support team needs some help from you in order to resolve your {ticket.get('title')} request for you. Kindly reach out to our support team to help them resolve your request",
+        3: f"Our support team is currently working on your {ticket.get('title')} request. You will be notified when it is finally resolved",
+        4: f"Your {ticket.get('title')} support request has been successfully resolved. Thanks for your patience."
     }
+    column_id = ticket.get("column_id")
 
-    print(ticket_type in ticket_descriptions, "ticket_type")
-
-    if ticket_type in ticket_descriptions:
-        description_function = ticket_descriptions[ticket_type]
-        title, description, priority = description_function(kwargs)
-        return {
-            "order_id": order_id,
-            # "type": ticket_type,
-            "order_number": order_id,
-            "title": title,
-            "description": description,
-            "priority": priority
-        }
-    else:
-        return {}
+    return map_column_id_status.get(column_id, f"Your {ticket.get('title')}  support ticket is yet to be resolved. Kindly exercise some patience for us to resolve this as soon as possible")

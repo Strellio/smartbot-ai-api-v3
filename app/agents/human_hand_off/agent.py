@@ -12,9 +12,10 @@ from app.agents.human_hand_off.tools import HumanHandoffTool
 class HumanHandoffAgent(BaseModel):
     human_handoff_agent: Union[AgentExecutor, None] = Field(...)
     llm_chain: Union[LLMChain, None] = Field(...)
+    user_input: str
 
     @classmethod
-    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3) -> "HumanHandoffAgent":
+    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input='') -> "HumanHandoffAgent":
         handoff_tools = [
             HumanHandoffTool(
                 customer=customer
@@ -41,8 +42,7 @@ class HumanHandoffAgent(BaseModel):
 
         )
 
-        return self(human_handoff_agent=human_handoff_agent, llm_chain=llm_chain)
+        return self(human_handoff_agent=human_handoff_agent, llm_chain=llm_chain, user_input=user_input)
 
     def run(self, input: str):
-        print("handoff input is ", input)
-        return self.human_handoff_agent.run(input)
+        return self.human_handoff_agent.run(self.user_input)

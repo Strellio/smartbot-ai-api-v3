@@ -3,6 +3,8 @@ from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
 client = MongoClient(getenv("DATABASE_URL"))
+# initialize MongoDB python client
+atlasClient = MongoClient(getenv("MONGODB_ATLAS_URL"))
 name = getenv("DATABASE_NAME")
 db = client[name]
 

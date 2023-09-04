@@ -12,9 +12,10 @@ from app.agents.tickets.create.tools import support_ticket_tools, support_ticket
 class OrderTicketAgent(BaseModel):
     order_ticket_agent: Union[AgentExecutor, None] = Field(...)
     llm_chain: Union[LLMChain, None] = Field(...)
+    user_input: str
 
     @classmethod
-    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=3) -> "OrderTicketAgent":
+    def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input='') -> "OrderTicketAgent":
         llm_chain = LLMChain(
             llm=llm, prompt=order_ticket_prompt)
 
@@ -22,7 +23,7 @@ class OrderTicketAgent(BaseModel):
             output_parser=SupportTicketOutputParser(
                 business=business, customer=customer, chat_platform=chat_platform),
             llm_chain=llm_chain,
-            stop=["\nObservation:"],
+            stop=["\Observation:"],
             allowed_tools=support_ticket_tools_names,
             verbose=verbose,
 
@@ -34,7 +35,7 @@ class OrderTicketAgent(BaseModel):
 
         )
 
-        return self(order_ticket_agent=order_ticket_agent, llm_chain=llm_chain)
+        return self(order_ticket_agent=order_ticket_agent, llm_chain=llm_chain, user_input=user_input)
 
     def run(self, input: str):
         return self.order_ticket_agent.run(input)

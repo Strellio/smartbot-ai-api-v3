@@ -13,6 +13,9 @@ Follow these steps to handover the conversation using the previous conversation 
 1. Tell the customer no agent is currrently available online. So you want to find out from them if they still want you to handoff the conversation
 2. Base on the response from the previous step. use  use one of {tools} to handoff the converdation.
 
+
+You must find out again from the customer to handoff the conversation since there is no human currently online before when the customer gives their approval again then you then handoff the the conversation
+
 You must respond according to the previous conversation history
 
 
