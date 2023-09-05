@@ -51,7 +51,7 @@ def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platfo
         )
 
 
-def getOffersAndPromos(llm: ChatOpenAI, business, verbose=False, ):
+def getOffersAndPromos(llm: ChatOpenAI, business, verbose=False, **kwargs):
     text = """
             Amazing Offers, Discounts, Promotions, and Coupons!
 
@@ -103,7 +103,7 @@ def getOffersAndPromos(llm: ChatOpenAI, business, verbose=False, ):
     return offers_knowledge_base
 
 
-def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
+def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False,  **kwargs):
 
     # get data and saving. botth redis and mongodb
     # shpify_loader = ShopifyLoader(domain=business.get("shop").get("external_platform_domain"),
