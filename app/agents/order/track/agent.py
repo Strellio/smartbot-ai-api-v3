@@ -7,7 +7,7 @@ from app.agents.order.track.parser import OrderTrackOutputParser
 from langchain.agents import LLMSingleActionAgent, AgentExecutor
 from app.agents.order.track.prompt import getOrderTrackingPrompt
 from app.agents.order.track.tools import getTools
-from langchain.memory import ReadOnlySharedMemory, ConversationBufferMemory
+from langchain.memory import ConversationBufferMemory
 
 
 class OrderTrackAgent(BaseModel):
@@ -19,7 +19,7 @@ class OrderTrackAgent(BaseModel):
     @classmethod
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input='') -> "OrderTrackAgent":
 
-        tools = getTools(llm=llm, memory=ReadOnlySharedMemory(memory=memory), verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
+        tools = getTools(llm=llm, memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
                          max_iterations=max_iterations, user_input=user_input)
 
         tool_names = [tool.name for tool in tools]
