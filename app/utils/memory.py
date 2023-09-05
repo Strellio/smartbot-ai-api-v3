@@ -3,7 +3,7 @@ from langchain.memory.chat_message_histories import RedisChatMessageHistory, Mon
 import os
 
 
-def getMemory(session_id: str, db_name: str, memory_key: str, collection_name="chat_message_history"):
+def getMemory(session_id: str, db_name: str, memory_key: str, collection_name="chat_message_history", return_messages=False):
     # message_history = RedisChatMessageHistory(
     #     url=f"{os.environ.get('REDIS_URL')}/2", ttl=600, session_id=session_id
     # )
@@ -13,6 +13,6 @@ def getMemory(session_id: str, db_name: str, memory_key: str, collection_name="c
     )
 
     memory = ConversationBufferMemory(
-        memory_key=memory_key, chat_memory=message_history, k=5, return_messages=False, human_prefix="Customer"
+        memory_key=memory_key, chat_memory=message_history, k=5, return_messages=return_messages, human_prefix="Customer"
     )
     return memory

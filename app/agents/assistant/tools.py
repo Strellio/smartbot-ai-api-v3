@@ -1,6 +1,6 @@
 from langchain.tools import Tool
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Redis, MongoDBAtlasVectorSearch
@@ -24,6 +24,7 @@ from app.agents.tickets.status.agent import TicketStatusAgent
 from app.constant import PRODUCT_VECTORSTORE_COLLECTION_NAME, PRODUCT_VECTORSTORE_INDEX_NAME
 
 from app.services.agents.get_business_agents import getBusinessOnlineAgent
+from app.utils.memory import getMemory
 
 
 def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input=''):
@@ -51,7 +52,7 @@ def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platfo
         )
 
 
-def getOffersAndPromos(llm: ChatOpenAI, business, verbose=False, **kwargs):
+def getOffersAndPromos(llm: ChatOpenAI, business, customer, verbose=False, **kwargs):
     text = """
             Amazing Offers, Discounts, Promotions, and Coupons!
 
@@ -96,14 +97,15 @@ def getOffersAndPromos(llm: ChatOpenAI, business, verbose=False, **kwargs):
 
     vectorestore = FAISS.from_documents(
         documents=documents, embedding=OpenAIEmbeddings())
-    offers_knowledge_base = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=vectorestore.as_retriever()
+    offers_knowledge_base = ConversationalRetrievalChain.from_llm(
+        llm=llm, chain_type="stuff", retriever=vectorestore.as_retriever(), memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
+                                                                                             memory_key="chat_history", return_messages=True)
     )
 
     return offers_knowledge_base
 
 
-def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False,  **kwargs):
+def setupProductKnowlegeBase(llm: ChatOpenAI, business, customer, verbose=False,  **kwargs):
 
     # get data and saving. botth redis and mongodb
     # shpify_loader = ShopifyLoader(domain=business.get("shop").get("external_platform_domain"),
@@ -125,8 +127,9 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False,  **kwargs
     )
 
     product_doc_retriever = vectorstore.as_retriever()
-    knowledge_base = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=product_doc_retriever, verbose=verbose
+    knowledge_base = ConversationalRetrievalChain.from_llm(
+        llm=llm, chain_type="stuff", retriever=product_doc_retriever, verbose=verbose, memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
+                                                                                                        memory_key="chat_history", return_messages=True)
     )
 
     return knowledge_base

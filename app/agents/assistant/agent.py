@@ -6,7 +6,7 @@ from langchain.chains.base import Chain
 from pydantic import BaseModel, Field
 from typing import Any
 from langchain.memory import ConversationBufferMemory
-from app.agents.assistant.tools import getHumanHandOffTool, getOffersAndPromos, getTools, setupProductKnowlegeBase
+from app.agents.assistant.tools import getHumanHandOffTool, getOffersAndPromos, setupProductKnowlegeBase
 
 
 from app.agents.order.track.agent import OrderTrackAgent
