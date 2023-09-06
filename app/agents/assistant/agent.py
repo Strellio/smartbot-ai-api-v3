@@ -10,6 +10,7 @@ from app.agents.assistant.tools import getHumanHandOffTool, getOffersAndPromos, 
 
 
 from app.agents.order.track.agent import OrderTrackAgent
+from app.agents.product.search.agent import ProductKnowledgeBaseAgent
 
 from app.agents.tickets.create.agent import OrderTicketAgent
 
@@ -25,13 +26,12 @@ class ShopAssistant(BaseModel):
     def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, business, chat_platform, customer, sub_team_id, verbose=False, max_iterations=10, user_input=''):
 
         sub_team_agent_dict = {
-            "2": setupProductKnowlegeBase,
+            "2": ProductKnowledgeBaseAgent.init,
             "3": OrderTicketAgent.init,
             "4": TicketStatusAgent.init,
             "5": OrderTrackAgent.init,
             "6": getHumanHandOffTool,
             "7": getOffersAndPromos
-
         }
 
         handler = sub_team_agent_dict.get(sub_team_id)

@@ -128,8 +128,15 @@ def setupProductKnowlegeBase(llm: ChatOpenAI, business, customer, verbose=False,
 
     product_doc_retriever = vectorstore.as_retriever()
     knowledge_base = ConversationalRetrievalChain.from_llm(
-        llm=llm, chain_type="stuff", retriever=product_doc_retriever, verbose=verbose, memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
-                                                                                                        memory_key="chat_history", return_messages=True)
+        llm=llm,
+        chain_type="stuff",
+        retriever=product_doc_retriever,
+        verbose=verbose,
+        memory=getMemory(session_id=customer.get("_id"),
+                         db_name=business.get("account_name"),
+
+
+                         memory_key="chat_history", return_messages=True)
     )
 
     return knowledge_base

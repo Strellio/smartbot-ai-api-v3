@@ -31,10 +31,10 @@ class SubTeamAnalyzerChain(ConversationChain):
             3. Request order support or report order issue Team: This sub-team handles cusutomers who reports issues related to their order, such as cancellations, returns, payment problems, or delivery concerns.
             4. Follow up on support ticket Team: This sub-team handles customers  seeking to know the resolution status of their support ticket.
             5. Order status and tracking Team: This sub-team handles customers seeking information about their order. Like getting to know the status of the order and tracking it.
-            6. Human Handoff: This sub-team handles customers who wants to talk to a human being and does not want to talk to any AI assistant or any bot.
-            7. Offers and Promotions: This sub-team handles customers looking for  current offers, promotions, discounts or deals.
+            6. Human Handoff Team: This sub-team handles customers who wants to talk to a human being and does not want to talk to any AI assistant or any bot.
+            7. Offers and Promotions Team: This sub-team handles customers looking for  current offers, promotions, discounts or deals.
 
-            Only answer with a number between 1 and 7 with the best guess of which sub-team should be routed to or maintained base on on the customer recent message and also considering the current sub-team already in charge. If it is something not specific to any team use recommend the current sub-team. 
+            Only answer with a number between 1 and 7 with the best which sub-team the customer be routed to or maintained base on on the customer last message and also considering the current sub-team already in charge. If it is something not specific to any team use recommend the current sub-team. 
             The answer needs to be one number only, no words.
             Do not answer anything else nor add anything to your answer."""
         prompt = PromptTemplate(
