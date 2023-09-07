@@ -34,7 +34,7 @@ class SubTeamAnalyzerChain(ConversationChain):
             6. Human Handoff Team: This sub-team handles customers who wants to talk to a human being and does not want to talk to any AI assistant or any bot.
             7. Offers and Promotions Team: This sub-team handles customers looking for  current offers, promotions, discounts or deals.
 
-            Only answer with a number between 1 and 7 with the appropriate  sub-team the customer be routed to or maintained base on on the customer last message. If it is something not specific to any sub-team just recommend the current sub-team already responding to the customer. 
+            Only answer with a number between 1 and 7 indicating the most suitable sub-team to address the customer's query based solely on their last message. If the last customer message does not clearly relate to any specific sub-team, it might be a subsequent communication with the current sub-team so you have to continue with the current sub-team.
             The answer needs to be one number only, no words.
             Do not answer anything else nor add anything to your answer.
             Make sure you recommend the best and appropriate sub-team designated to assist the customer as any bad recommendation will will cause the entire customer service team a great havoc

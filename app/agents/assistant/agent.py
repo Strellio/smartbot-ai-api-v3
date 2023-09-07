@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from typing import Any
 from langchain.memory import ConversationBufferMemory
 from app.agents.assistant.tools import getHumanHandOffTool, getOffersAndPromos, setupProductKnowlegeBase
+from app.agents.introduction.chain import IntroductionChain
 
 
 from app.agents.order.track.agent import OrderTrackAgent
@@ -26,6 +27,7 @@ class ShopAssistant(BaseModel):
     def init(self, llm: ChatOpenAI, memory: ConversationBufferMemory, business, chat_platform, customer, sub_team_id, verbose=False, max_iterations=10, user_input=''):
 
         sub_team_agent_dict = {
+            "1": IntroductionChain.from_llm,
             "2": ProductKnowledgeBaseAgent.init,
             "3": OrderTicketAgent.init,
             "4": TicketStatusAgent.init,
