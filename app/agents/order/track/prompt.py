@@ -72,7 +72,7 @@ def getOrderTrackingPrompt(tools):
         # This includes the `intermediate_steps` variable because that is needed
         input_variables=[
             "input",
-            "intermediate_steps",
-            # "shop_name",
+            # "intermediate_steps",
+            "agent_scratchpad",
             "chat_history"]
     )
