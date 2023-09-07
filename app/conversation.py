@@ -1,5 +1,5 @@
 
-import os
+import re
 from app.agents.assistant.agent import ShopAssistant
 from app.agents.team_selection.chain import SubTeamAnalyzerChain
 
@@ -9,6 +9,28 @@ from app.services.businesses import getBusinessAndChatPlatform
 from app.services.customers.get_customer import getCustomerByPlatform
 from app.utils.llm import getLLM
 from app.utils.memory import getMemory
+
+
+def remove_tags(text_with_tags):
+    # Remove lines containing "Tags:"
+    text_without_tags = re.sub(r'\n\s*-?\s*Tags:.*\n', '\n', text_with_tags)
+    return text_without_tags.strip()
+
+
+def markdown_to_text(markdown_string):
+    # Remove Markdown link syntax and keep only the URLs
+    markdown_string = re.sub(r'\[.*?\]\((.*?)\)', r'\1', markdown_string)
+
+    # Remove Markdown emphasis and bold syntax
+    markdown_string = re.sub(r'\*{1,2}', '', markdown_string)
+
+    return markdown_string.strip()
+
+
+def format_response(response: str):
+    response_without_tags = remove_tags(response)
+    md_to_text = markdown_to_text(response_without_tags)
+    return md_to_text
 
 
 def conversation(input: Input):
@@ -28,4 +50,4 @@ def conversation(input: Input):
         llm=llm, memory=message_memory, business=business, chat_platform=chat_platform, customer=customer, verbose=True, user_input=input.message, sub_team_id=f"{sub_team_id}")
     # with PromptWatch(api_key=os.getenv("PROMPTWATCH_API_KEY")) as pw:
     output = shop_assistant.run(input=input.message)
-    return output
+    return format_response(output)

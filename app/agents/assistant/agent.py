@@ -1,12 +1,10 @@
 
 
-from langchain import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.chains.base import Chain
 from pydantic import BaseModel, Field
 from typing import Any
 from langchain.memory import ConversationBufferMemory
-from app.agents.assistant.tools import getHumanHandOffTool, getOffersAndPromos, setupProductKnowlegeBase
+from app.agents.assistant.tools import getHumanHandOffTool, getOffersAndPromos
 from app.agents.introduction.chain import IntroductionChain
 
 
@@ -17,7 +15,6 @@ from app.agents.tickets.create.agent import OrderTicketAgent
 
 
 from app.agents.tickets.status.agent import TicketStatusAgent
-from app.utils.memory import getMemory
 
 
 class ShopAssistant(BaseModel):

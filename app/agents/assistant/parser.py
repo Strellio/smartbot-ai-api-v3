@@ -1,7 +1,7 @@
 
 import re
 from typing import Union
-from langchain.agents.agent import AgentOutputParser, OutputParserException
+from langchain.agents.agent import AgentOutputParser
 from langchain.schema import AgentAction, AgentFinish
 from langchain.agents.conversational.prompt import FORMAT_INSTRUCTIONS
 
