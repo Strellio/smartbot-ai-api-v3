@@ -27,16 +27,18 @@ class SubTeamAnalyzerChain(ConversationChain):
 
             Now determine the sub-team to route to or keep handling the conversation with the customer base on the customer message  by selecting one from the following options:
             1. Introduction Team: This sub-team handles a customer when the customer initiates a conversation with a greeting. Example is Hello, Hi, Hey, How are you and so on.
-            2. Product Search Team: This sub-team handles customers who are looking for a product or asking for information about a product.
+            2. Product Search Team: This sub-team handles customers who are looking for a product or asking for information about a product like price, links, options and so on.
             3. Request order support or report order issue Team: This sub-team handles cusutomers who reports issues related to their order, such as cancellations, returns, payment problems, or delivery concerns.
             4. Follow up on support ticket Team: This sub-team handles customers  seeking to know the resolution status of their support ticket.
             5. Order status and tracking Team: This sub-team handles customers seeking information about their order. Like getting to know the status of the order and tracking it.
             6. Human Handoff Team: This sub-team handles customers who wants to talk to a human being and does not want to talk to any AI assistant or any bot.
             7. Offers and Promotions Team: This sub-team handles customers looking for  current offers, promotions, discounts or deals.
 
-            Only answer with a number between 1 and 7 with the best which sub-team the customer be routed to or maintained base on on the customer last message and also considering the current sub-team already in charge. If it is something not specific to any team use recommend the current sub-team. 
+            Only answer with a number between 1 and 7 with the appropriate  sub-team the customer be routed to or maintained base on on the customer last message. If it is something not specific to any sub-team just recommend the current sub-team already responding to the customer. 
             The answer needs to be one number only, no words.
-            Do not answer anything else nor add anything to your answer."""
+            Do not answer anything else nor add anything to your answer.
+            Make sure you recommend the best and appropriate sub-team designated to assist the customer as any bad recommendation will will cause the entire customer service team a great havoc
+            """
         prompt = PromptTemplate(
             template=stage_analyzer_inception_prompt_template,
             input_variables=["chat_history", "input"],
