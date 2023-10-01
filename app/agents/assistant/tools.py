@@ -1,6 +1,6 @@
 from langchain.tools import Tool
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Redis, MongoDBAtlasVectorSearch
@@ -24,6 +24,7 @@ from app.agents.tickets.status.agent import TicketStatusAgent
 from app.constant import PRODUCT_VECTORSTORE_COLLECTION_NAME, PRODUCT_VECTORSTORE_INDEX_NAME
 
 from app.services.agents.get_business_agents import getBusinessOnlineAgent
+from app.utils.memory import getMemory
 
 
 def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input=''):
@@ -51,7 +52,7 @@ def getHumanHandOffTool(llm: ChatOpenAI, memory, business, customer, chat_platfo
         )
 
 
-def getOffersAndPromos(llm: ChatOpenAI, business, verbose=False, ):
+def getOffersAndPromos(llm: ChatOpenAI, business, customer, verbose=False, **kwargs):
     text = """
             Amazing Offers, Discounts, Promotions, and Coupons!
 
@@ -96,96 +97,9 @@ def getOffersAndPromos(llm: ChatOpenAI, business, verbose=False, ):
 
     vectorestore = FAISS.from_documents(
         documents=documents, embedding=OpenAIEmbeddings())
-    offers_knowledge_base = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=vectorestore.as_retriever()
+    offers_knowledge_base = ConversationalRetrievalChain.from_llm(
+        llm=llm, chain_type="stuff", retriever=vectorestore.as_retriever(), memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
+                                                                                             memory_key="chat_history", return_messages=True)
     )
 
     return offers_knowledge_base
-
-
-def setupProductKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
-
-    # get data and saving. botth redis and mongodb
-    # shpify_loader = ShopifyLoader(domain=business.get("shop").get("external_platform_domain"),
-    #                               access_token=business.get("shop").get("external_access_token"), resource="products")
-
-    # index = VectorstoreIndexCreator(
-    #     vectorstore_cls=Redis, vectorstore_kwargs={"index_name": "store-products", "redis_url": f"{getenv('REDIS_URL')}"}).from_loaders([shpify_loader])
-
-    # index = VectorstoreIndexCreator(
-    #     vectorstore_cls=MongoDBAtlasVectorSearch, vectorstore_kwargs={"index_name": index_name, "collection": collection}).from_loaders([shpify_loader])
-
-    db_name = business.get('account_name')
-    collection = atlasClient[db_name][PRODUCT_VECTORSTORE_COLLECTION_NAME]
-
-    vectorstore = MongoDBAtlasVectorSearch(
-        collection=collection,
-        embedding=OpenAIEmbeddings(),
-        index_name=PRODUCT_VECTORSTORE_INDEX_NAME
-    )
-
-    product_doc_retriever = vectorstore.as_retriever()
-    knowledge_base = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=product_doc_retriever, verbose=verbose
-    )
-
-    return knowledge_base
-
-
-def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_input, verbose=False, max_iterations=10):
-    order_ticket_agent = OrderTicketAgent.init(llm=llm,
-                                               memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
-
-    ticket_status_agent = TicketStatusAgent.init(llm=llm,
-                                                 memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
-
-    human_handoff_tool = getHumanHandOffTool(llm=llm,
-                                             memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
-    knowledge_base = setupProductKnowlegeBase(
-        llm=llm, verbose=verbose, business=business)
-    offers_knowledge_base = getOffersAndPromos(
-        llm=llm, verbose=verbose, business=business)
-
-    order_tracking_agent = OrderTrackAgent.init(llm=llm,
-                                                memory=memory, verbose=verbose, business=business, chat_platform=chat_platform, customer=customer, max_iterations=max_iterations, user_input=user_input)
-
-    tools = [
-        Tool(
-            name="ProductSearch",
-            func=knowledge_base.run,
-            return_direct=False,
-            description="useful for when you need to answer questions about product information",
-        ),
-        Tool(
-            name="CreateNewSupportTicket",
-            func=order_ticket_agent.run,
-            return_direct=True,
-            description="useful for when you need to create a support ticket for an issue a customer is reporting about their order. This is when a customer report an issue to you."
-
-        ),
-        Tool(
-            name="CheckOrderStatusAndOrderTracking",
-            func=order_tracking_agent.run,
-            return_direct=False,
-            description="useful for when you need to check the status of an order, track an order and answer questions about an order"
-        ),
-        Tool(
-            name="CheckStatusOfCreatedSupportTicket",
-            func=ticket_status_agent.run,
-            return_direct=True,
-            description="useful for when you need to check the status of a support ticket to know whether it has been resolved or not"
-
-        ),
-        Tool(
-            name="PromotionsOrOffersOrDiscountsOrDeals",
-            func=offers_knowledge_base.run,
-            return_direct=False,
-            description="useful for when you need to answers questions about current offers or promotions or discounts or deals"
-
-        ),
-
-        human_handoff_tool
-
-    ]
-
-    return tools

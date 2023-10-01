@@ -1,6 +1,6 @@
 
 from typing import Union
-from langchain import LLMChain
+from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
 from langchain.agents import LLMSingleActionAgent, AgentExecutor

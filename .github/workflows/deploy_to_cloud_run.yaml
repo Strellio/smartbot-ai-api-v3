@@ -1,0 +1,122 @@
+name: Deploy to Cloud Run
+on:
+  workflow_call:
+    inputs:
+      PROJECT_NUMBER:
+        required: true
+        type: number
+      PROJECT_ID:
+        required: true
+        type: string
+      # GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME:
+      #   required: true
+      #   type: string
+      SERVICE_NAME:
+        required: true
+        type: string
+      WORKING_DIR:
+        required: true
+        type: string
+      # GOOGLE_APPLICATION_CREDENTIALS_BASE64_SECRET_NAME:
+      #   required: true
+      #   type: string
+      ENV_FILE_BASE64_SECRET_NAME:
+        required: true
+        type: string
+      POOL_PROVIDER:
+        required: true
+        type: string
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.SERVICE_NAME }}
+  cancel-in-progress: true
+env:
+  PROJECT_NUMBER: ${{ inputs.PROJECT_NUMBER }}
+  PROJECT_ID: ${{ inputs.PROJECT_ID }}
+  SERVICE_ACCOUNT: smartbot@${{ inputs.PROJECT_ID }}.iam.gserviceaccount.com
+  # GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME: ${{ inputs.GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME }}
+  SERVICE_NAME: ${{ inputs.SERVICE_NAME }}
+  WORKING_DIR: ${{ inputs.WORKING_DIR }}
+  # GOOGLE_APPLICATION_CREDENTIALS_BASE64: ${{ secrets[inputs.GOOGLE_APPLICATION_CREDENTIALS_BASE64_SECRET_NAME] }}
+  ENV_FILE_BASE64: ${{ secrets[inputs.ENV_FILE_BASE64_SECRET_NAME] }}
+  POOL_PROVIDER: ${{ inputs.POOL_PROVIDER }}
+jobs:
+  deploy-to-cloud-run:
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - uses: "actions/checkout@v3"
+      - name: Download build log
+        uses: actions/download-artifact@v3
+        with:
+          name: build_setup
+      - name: Print the log
+        shell: bash
+        run: |
+          value=`cat build_log.txt`
+          echo $value
+      - name: Print the ENV NAME
+        shell: bash
+        run: echo ${{ inputs.ENV_FILE_BASE64_SECRET_NAME }}}
+      - name: Print the INPUT SERVICE NAME
+        shell: bash
+        run: echo ${{ inputs.SERVICE_NAME }}}
+      - name: Print the ENV SERVICE NAME
+        shell: bash
+        run: echo ${{ env.SERVICE_NAME }}}
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     token: ${{ secrets.GH_TOKEN }}
+      #     node-version: ${{ matrix.node-version }}
+      #     registry-url: "https://npm.pkg.github.com/eggseed"
+      #     always-auth: true
+      - id: "auth"
+        name: "Authenticate with Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          workload_identity_provider: "projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/dev-pool/providers/${{ env.POOL_PROVIDER }}"
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v1"
+        with:
+          version: ">= 363.0.0"
+      - name: "Use gcloud CLI"
+        run: "gcloud info"
+      # - name: Setup npmrc file
+      #   uses: timheuer/base64-to-file@v1.2
+      #   with:
+      #     fileName: .npmrc
+      #     encodedString: ${{ secrets.BACKEND_NPMRC_BASE_64 }}
+      #     fileDir: ${{ env.WORKING_DIR }}
+      - name: Setup Env File
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: .env
+          encodedString: ${{ env.ENV_FILE_BASE64 }}
+          fileDir: ${{ env.WORKING_DIR }}
+
+      # - name: Setup Google Application Creds
+      #   uses: timheuer/base64-to-file@v1.2
+      #   with:
+      #     fileName: ${{ env.GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME }}
+      #     encodedString: ${{ env.GOOGLE_APPLICATION_CREDENTIALS_BASE64 }}
+      #     fileDir: ${{ env.WORKING_DIR }}
+
+      - name: Configure Auth
+        run: "gcloud auth configure-docker us-central1-docker.pkg.dev"
+
+      - name: "Build"
+        run: "docker build -t us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/${{ env.SERVICE_NAME }}:${{ github.sha }} ."
+        working-directory: ${{ env.WORKING_DIR }}
+      - name: "Push"
+        run: "docker push us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+        working-directory: ${{ env.WORKING_DIR }}
+      - name: Deploy
+        id: deploy
+        run: |
+          output=$(gcloud run deploy ${{ env.SERVICE_NAME }} --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/${{ env.SERVICE_NAME }}:${{ github.sha }} --region us-central1 --platform managed)
+          echo "service_url=$output" >> "$GITHUB_OUTPUT"
+      - id: "test"
+        run: 'echo "${{ steps.deploy.outputs.service_url }}/health"'

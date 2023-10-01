@@ -1,11 +1,35 @@
 
 from typing import Union
-from langchain import LLMChain
+from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
 from app.agents.tickets.status.parser import SupportTicketStatusOutputParser
 from langchain.agents import LLMSingleActionAgent, AgentExecutor
 from app.agents.tickets.status.prompt import ticket_status_prompt
+
+from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
+from langchain.schema.messages import SystemMessage
+from langchain.prompts import MessagesPlaceholder
+
+from langchain.prompts.chat import SystemMessagePromptTemplate
+
+
+from langchain.tools import StructuredTool
+from app.agents.tickets.status.utils import generateTicketResponseBaseOnColumnID
+
+from app.services.tickets.get_ticket import getTicket
+from app.utils.memory import getMemory
+
+
+def ticketStatus(customerId):
+    def getTicketByTicketNumber(ticketNumber):
+        print(ticketNumber)
+        ticket = getTicket(customerId, f"{ticketNumber}")
+        if not ticket:
+            return f"I could not find any support ticket of yours with number {ticketNumber}. Kindly recheck and try again"
+        else:
+            return generateTicketResponseBaseOnColumnID(ticket)
+    return getTicketByTicketNumber
 
 
 class TicketStatusAgent(BaseModel):
@@ -17,26 +41,50 @@ class TicketStatusAgent(BaseModel):
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, user_input, verbose=False, max_iterations=10) -> "TicketStatusAgent":
         llm_chain = LLMChain(
             llm=llm, prompt=ticket_status_prompt)
+        system_message = SystemMessage(
+            content=(
+                """
+                You are a assistant that assists customers to follow up on their support ticket to get update on it. 
 
-        ticket_status_with_tools = LLMSingleActionAgent(
-            output_parser=SupportTicketStatusOutputParser(
-                business=business, customer=customer, chat_platform=chat_platform),
-            llm_chain=llm_chain,
-            stop=["\nObservation:"],
-            allowed_tools=[],
-            verbose=verbose,
+                The customer has to provide the ticketNumber in order for you to help identify the exact support ticket.
 
-            max_iterations=max_iterations,
+                Always request for a new ticketNumber from the customer for every follow up.
+
+                Remember, do not generate any hypothetical conversations. You must have a real conversation with the customer.
+
+                Never tell the customer to contact the support team directly. 
+
+                After taking the ticket number use a tool to get the ticket details 
+
+                """
+
+            )
         )
 
-        ticket_status_agent = AgentExecutor.from_agent_and_tools(
-            agent=ticket_status_with_tools, tools=[
-            ], verbose=verbose, max_iterations=max_iterations, memory=memory
+        tools = [
+            StructuredTool.from_function(
+                name="CheckStatusOfCreatedSupportTicket",
+                func=ticketStatus(customer.get("_id")),
+                return_direct=False,
+                description="useful for when you need to check the status or follow up on a support ticket",
+                # description="useful for when you need to answer questions about order information, getting status and update for orders",
+            )
+        ]
 
+        prompt = OpenAIFunctionsAgent.create_prompt(
+            system_message=system_message,
+            extra_prompt_messages=[MessagesPlaceholder(variable_name="chat_history")])
+
+        agent = OpenAIFunctionsAgent(
+            llm=llm, tools=tools, prompt=prompt)
+
+        ticket_status_agent = AgentExecutor.from_agent_and_tools(
+            agent=agent, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
+                                                                                                       memory_key="chat_history", return_messages=True)
         )
 
         return self(ticket_status_agent=ticket_status_agent, llm_chain=llm_chain, user_input=user_input)
 
     def run(self, input: str):
         print("status", self.user_input)
-        return self.ticket_status_agent.run(self.user_input)
+        return self.ticket_status_agent.run(input)

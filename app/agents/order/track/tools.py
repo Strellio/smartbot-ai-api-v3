@@ -3,7 +3,7 @@ from langchain.chains import RetrievalQA
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Redis, MongoDBAtlasVectorSearch
 from app.lib.db import atlasClient
-from langchain.tools import Tool
+from langchain.tools import Tool, StructuredTool
 
 
 from app.constant import ORDER_VECTORSTORE_COLLECTION_NAME, ORDER_VECTORSTORE_INDEX_NAME
@@ -25,18 +25,25 @@ def getOrderKnowlegeBase(llm: ChatOpenAI, business, verbose=False, ):
         llm=llm, chain_type="stuff", retriever=order_doc_retriever, verbose=verbose
     )
 
-    return knowledge_base
+    def parsing_multiplier(input):
+        print(input)
+        if type(input) is list:
+            return knowledge_base.run(f"{''.join(input)}. Make sure you return the full information about the order")
+        else:
+            return knowledge_base.run(f"{input}. Make sure you return the full information about the order")
+
+    return parsing_multiplier
 
 
 def getTools(llm: ChatOpenAI, memory, business, customer, chat_platform, user_input, verbose=False, max_iterations=10):
     knowledge_base = getOrderKnowlegeBase(
         llm=llm, business=business, verbose=verbose)
     tools = [
-        Tool(
+        StructuredTool.from_function(
             name="OrderSearch",
-            func=knowledge_base.run,
+            func=knowledge_base,
             return_direct=False,
-            description="useful for when you need to answer questions about order information"
+            description="useful for when you need to answer questions about order information.",
             # description="useful for when you need to answer questions about order information, getting status and update for orders",
         )
     ]

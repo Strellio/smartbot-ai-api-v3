@@ -7,10 +7,13 @@
 			"path": "../../../smartbotv2-dashboard"
 		},
 		{
-			"path": "../../../smartbotv2-widget"
+			"path": "../.."
 		},
 		{
-			"path": "../.."
+			"path": "../../../website"
+		},
+		{
+			"path": "../../../../../Downloads/strellio 2"
 		}
 	],
 	"settings": {
