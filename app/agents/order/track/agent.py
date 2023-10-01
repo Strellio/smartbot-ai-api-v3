@@ -1,12 +1,9 @@
 
-from typing import Union
-from langchain.chains import LLMChain
+from typing import Any
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
 from langchain.agents import AgentExecutor
-from app.agents.order.track.prompt import getOrderTrackingPrompt
 from app.agents.order.track.tools import getTools
-from langchain.memory import ConversationBufferMemory
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
 from langchain.schema.messages import SystemMessage
 from langchain.prompts import MessagesPlaceholder
@@ -15,10 +12,8 @@ from app.utils.memory import getMemory
 
 
 class OrderTrackAgent(BaseModel):
-    order_track_agent: Union[AgentExecutor, None] = Field(...)
-    llm_chain: Union[LLMChain, None] = Field(...)
+    order_track_agent: Any = Field(...)
     user_input: str
-    memory: ConversationBufferMemory = Field(...)
 
     @classmethod
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input='') -> "OrderTrackAgent":
@@ -26,8 +21,6 @@ class OrderTrackAgent(BaseModel):
         tools = getTools(llm=llm, memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
                          max_iterations=max_iterations, user_input=user_input)
 
-        llm_chain = LLMChain(
-            llm=llm, prompt=getOrderTrackingPrompt(tools=tools))
         system_message = SystemMessage(
             content=(
                 """
@@ -73,7 +66,7 @@ Don't send  links or urls like this [link] or [tracking URL] to the customer. Ju
 
         )
 
-        return self(order_track_agent=order_track_agent, llm_chain=llm_chain, user_input=user_input, memory=memory)
+        return self(order_track_agent=order_track_agent,  user_input=user_input)
 
     def run(self, input: str):
         return self.order_track_agent.run(input=input)

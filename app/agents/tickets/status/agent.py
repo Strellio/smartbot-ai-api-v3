@@ -1,18 +1,12 @@
 
-from typing import Union
-from langchain.chains import LLMChain
+from typing import Any
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
-from app.agents.tickets.status.parser import SupportTicketStatusOutputParser
-from langchain.agents import LLMSingleActionAgent, AgentExecutor
-from app.agents.tickets.status.prompt import ticket_status_prompt
+from langchain.agents import AgentExecutor
 
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
 from langchain.schema.messages import SystemMessage
 from langchain.prompts import MessagesPlaceholder
-
-from langchain.prompts.chat import SystemMessagePromptTemplate
-
 
 from langchain.tools import StructuredTool
 from app.agents.tickets.status.utils import generateTicketResponseBaseOnColumnID
@@ -33,14 +27,12 @@ def ticketStatus(customerId):
 
 
 class TicketStatusAgent(BaseModel):
-    ticket_status_agent: Union[AgentExecutor, None] = Field(...)
-    llm_chain: Union[LLMChain, None] = Field(...)
+    ticket_status_agent: Any = Field(...)
     user_input: str
 
     @classmethod
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, user_input, verbose=False, max_iterations=10) -> "TicketStatusAgent":
-        llm_chain = LLMChain(
-            llm=llm, prompt=ticket_status_prompt)
+
         system_message = SystemMessage(
             content=(
                 """
@@ -83,8 +75,7 @@ class TicketStatusAgent(BaseModel):
                                                                                                        memory_key="chat_history", return_messages=True)
         )
 
-        return self(ticket_status_agent=ticket_status_agent, llm_chain=llm_chain, user_input=user_input)
+        return self(ticket_status_agent=ticket_status_agent, user_input=user_input)
 
     def run(self, input: str):
-        print("status", self.user_input)
         return self.ticket_status_agent.run(input)

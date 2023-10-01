@@ -1,11 +1,8 @@
 
-from typing import Union
-from langchain.chains import LLMChain
+from typing import Any
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
-from app.agents.tickets.create.parser import SupportTicketOutputParser
-from langchain.agents import LLMSingleActionAgent, AgentExecutor
-from app.agents.tickets.create.prompt import order_ticket_prompt
+from langchain.agents import AgentExecutor
 
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
 from langchain.schema.messages import SystemMessage
@@ -30,14 +27,12 @@ def createSupportTicketTool(customer, business, chat_platform):
 
 
 class OrderTicketAgent(BaseModel):
-    order_ticket_agent: Union[AgentExecutor, None] = Field(...)
-    llm_chain: Union[LLMChain, None] = Field(...)
+    order_ticket_agent: Any = Field(...)
     user_input: str
 
     @classmethod
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input='') -> "OrderTicketAgent":
-        llm_chain = LLMChain(
-            llm=llm, prompt=order_ticket_prompt)
+
         system_message = SystemMessage(
             content=(
                 """
@@ -79,7 +74,6 @@ After taking the required fields from the customer, use a tool to create the sup
                     customer=customer, business=business, chat_platform=chat_platform),
                 return_direct=False,
                 description="useful for when you need to create a support ticket for an issue a customer is reporting about their order. This is when a customer report an issue to you.",
-                # description="useful for when you need to answer questions about order information, getting status and update for orders",
             )
         ]
 
@@ -90,24 +84,13 @@ After taking the required fields from the customer, use a tool to create the sup
         agent = OpenAIFunctionsAgent(
             llm=llm, tools=tools, prompt=prompt)
 
-        # order_action_with_tools = LLMSingleActionAgent(
-        #     output_parser=SupportTicketOutputParser(
-        #         business=business, customer=customer, chat_platform=chat_platform),
-        #     llm_chain=llm_chain,
-        #     stop=["\Observation:"],
-        #     allowed_tools=support_ticket_tools_names,
-        #     verbose=verbose,
-
-        #     max_iterations=max_iterations,
-        # )
-
         order_ticket_agent = AgentExecutor.from_agent_and_tools(
             agent=agent, tools=tools, verbose=verbose, max_iterations=max_iterations,  memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
                                                                                                         memory_key="chat_history", return_messages=True)
 
         )
 
-        return self(order_ticket_agent=order_ticket_agent, llm_chain=llm_chain, user_input=user_input)
+        return self(order_ticket_agent=order_ticket_agent, user_input=user_input)
 
     def run(self, input: str):
         return self.order_ticket_agent.run(input)
