@@ -1,6 +1,6 @@
 
 from typing import Union
-from langchain import LLMChain
+from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
 from app.agents.tickets.create.parser import SupportTicketOutputParser

@@ -1,6 +1,8 @@
-from langchain import LLMChain, PromptTemplate, ConversationChain
+from langchain.chains import ConversationChain
 from langchain.llms import BaseLLM
 from langchain.memory import ConversationBufferMemory
+
+from langchain.prompts import PromptTemplate
 
 
 class IntroductionChain(ConversationChain):

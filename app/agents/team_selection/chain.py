@@ -1,7 +1,8 @@
-from langchain import PromptTemplate, ConversationChain
+from langchain.chains import ConversationChain
 from langchain.llms import BaseLLM
 from typing import Any
 from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
 
 
 class SubTeamAnalyzerChain(ConversationChain):
