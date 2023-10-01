@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Smartbot AI API"
 authors = ["wisdom0063 <kwartengwisdomug95@gmail.com>"]
 readme = "README.md"
-packages = [{include = "bot_api_v3"}]
+
+[tool.poetry.scripts]
+start = "app.main:start"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
