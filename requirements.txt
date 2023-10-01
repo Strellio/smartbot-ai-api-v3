@@ -1,7 +1,6 @@
 langchain
 redis
 openai
-numpy
 pandas
 gdown
 tiktoken
@@ -12,5 +11,4 @@ pymongo
 chromadb
 faiss-cpu 
 datetime
-promptwatch
 nanoid

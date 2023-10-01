@@ -1,12 +1,6 @@
-from langchain import LLMChain, PromptTemplate, ConversationChain
+from langchain import PromptTemplate, ConversationChain
 from langchain.llms import BaseLLM
-from langchain.agents import initialize_agent, AgentType
-from langchain.chat_models import ChatOpenAI
-from langchain.chains.base import Chain
-from pydantic import BaseModel, Field
-from typing import Union, Any
-from app.agents.assistant.parser import ShopAssistantOutputParser
-from app.agents.assistant.prompt import getShopAssistantPrompt
+from typing import Any
 from langchain.memory import ConversationBufferMemory
 
 

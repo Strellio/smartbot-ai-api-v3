@@ -3,8 +3,7 @@ from typing import Union
 from langchain import LLMChain
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
-from app.agents.order.track.parser import OrderTrackOutputParser
-from langchain.agents import LLMSingleActionAgent, AgentExecutor
+from langchain.agents import AgentExecutor
 from app.agents.order.track.prompt import getOrderTrackingPrompt
 from app.agents.order.track.tools import getTools
 from langchain.memory import ConversationBufferMemory
@@ -26,8 +25,6 @@ class OrderTrackAgent(BaseModel):
 
         tools = getTools(llm=llm, memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
                          max_iterations=max_iterations, user_input=user_input)
-
-        tool_names = [tool.name for tool in tools]
 
         llm_chain = LLMChain(
             llm=llm, prompt=getOrderTrackingPrompt(tools=tools))
@@ -60,7 +57,6 @@ You must respond according to the tool response.
 Don't send  links or urls like this [link] or [tracking URL] to the customer. Just always return the full and correct url you got from the tool response to the customer.
 
  """
-
             )
         )
 
@@ -71,16 +67,6 @@ Don't send  links or urls like this [link] or [tracking URL] to the customer. Ju
         agent = OpenAIFunctionsAgent(
             llm=llm, tools=tools, prompt=prompt)
 
-        # order_track_agent_with_tools = LLMSingleActionAgent(
-        #     output_parser=OrderTrackOutputParser(
-        #         business=business, customer=customer, chat_platform=chat_platform),
-        #     llm_chain=llm_chain,
-        #     stop=["\Observation:"],
-        #     allowed_tools=tool_names,
-        #     verbose=verbose,
-        #     max_iterations=max_iterations,
-        # )
-
         order_track_agent = AgentExecutor.from_agent_and_tools(
             agent=agent, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
                                                                                                        memory_key="chat_history", return_messages=True)
@@ -90,5 +76,4 @@ Don't send  links or urls like this [link] or [tracking URL] to the customer. Ju
         return self(order_track_agent=order_track_agent, llm_chain=llm_chain, user_input=user_input, memory=memory)
 
     def run(self, input: str):
-        print("user input", self.user_input)
         return self.order_track_agent.run(input=input)
