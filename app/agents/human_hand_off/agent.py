@@ -1,5 +1,5 @@
 
-from typing import Union
+from typing import Any
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from pydantic import Field, BaseModel
@@ -10,8 +10,8 @@ from app.agents.human_hand_off.tools import HumanHandoffTool
 
 
 class HumanHandoffAgent(BaseModel):
-    human_handoff_agent: Union[AgentExecutor, None] = Field(...)
-    llm_chain: Union[LLMChain, None] = Field(...)
+    human_handoff_agent: Any = Field(...)
+    llm_chain: Any = Field(...)
     user_input: str
 
     @classmethod
