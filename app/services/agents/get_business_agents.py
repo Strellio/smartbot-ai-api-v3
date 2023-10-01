@@ -5,5 +5,5 @@ from app.lib.db import agentsModel
 
 def getBusinessOnlineAgent(businessId: str):
     onlineAgents = agentsModel.find_one(
-        {"business": ObjectId(businessId), "is_online": True})
+        {"business": ObjectId(businessId), "availability_status": "available"})
     return onlineAgents

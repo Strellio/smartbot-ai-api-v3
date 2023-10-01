@@ -7,12 +7,18 @@ from langchain.callbacks.manager import (
 )
 from app.services.agents.talk_to_agent import talkToAgent
 
+# Create a new base class that inherits from both BaseTool and BaseModel
+
+
+class BaseToolModel(BaseTool):
+    pass
+
 
 class HumanHandoffToolInput(BaseModel):
     question: Optional[str] = None
 
 
-class HumanHandoffTool(BaseTool, BaseModel):
+class HumanHandoffTool(BaseToolModel):  # Inherit from the new base class
     name = "HumanHandoff"
     description = "useful for when you need to handoff the conversation to a human and let the customer talk to a human"
     args_schema: Type[BaseModel] = HumanHandoffToolInput

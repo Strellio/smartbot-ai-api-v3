@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from langcorn import create_service
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.conversation import conversation
@@ -20,6 +19,7 @@ async def input(input: Input):
 origins = [
     "<http://localhost>",
     "<http://localhost:5173>",
+    "<https://smartbotwebhooks.strellio.co>"
     "...Your Domains..."
 ]
 
