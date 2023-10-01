@@ -1,6 +1,5 @@
 
 from app.template.custom_template import PromptTemplateWithTools
-from app.agents.tickets.create.tools import support_ticket_tools
 
 human_handoff_template = """
 

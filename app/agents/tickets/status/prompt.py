@@ -1,6 +1,5 @@
 
 from app.template.custom_template import PromptTemplateWithTools
-from app.agents.tickets.create.tools import support_ticket_tools
 
 support_ticket_status_prompts = """
 You are a assistant that assists customers to follow up on their support ticket to get update on it. 
