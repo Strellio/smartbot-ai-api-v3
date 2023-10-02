@@ -9,6 +9,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
 from langchain.schema.messages import SystemMessage
 from langchain.prompts import MessagesPlaceholder
+from app.utils.llm import getLLM
 
 from app.utils.memory import getMemory
 
@@ -20,13 +21,14 @@ class ProductKnowledgeBaseAgent(BaseModel):
     @classmethod
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input='') -> "ProductKnowledgeBaseAgent":
 
-        tools = getTools(llm=llm, memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
-                         max_iterations=max_iterations, user_input=user_input)
+        tools = getTools(llm=getLLM(
+            model_name="gpt-4"), memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
+            max_iterations=max_iterations, user_input=user_input)
 
         system_message = SystemMessage(
             content=(
                 """
-Never forget you are a friendly and helpful shopping assistant that helps customers to:
+Never forget you are shopping assistant that helps customers to:
 1. search for products
 2 get information about products
 3 sell products
@@ -61,7 +63,8 @@ Don't tell them to find it on our website or any popular shopping website.
             system_message=system_message,
             extra_prompt_messages=[MessagesPlaceholder(variable_name="chat_history")])
 
-        agent = OpenAIFunctionsAgent(llm=llm, tools=tools, prompt=prompt)
+        agent = OpenAIFunctionsAgent(llm=getLLM(
+            model_name="gpt-4"), tools=tools, prompt=prompt)
 
         product_knowledge_base_agent = AgentExecutor.from_agent_and_tools(
             agent=agent, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
