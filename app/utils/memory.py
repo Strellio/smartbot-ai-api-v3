@@ -4,9 +4,6 @@ import os
 
 
 def getMemory(session_id: str, db_name: str, memory_key: str, collection_name="chat_message_history", return_messages=False):
-    # message_history = RedisChatMessageHistory(
-    #     url=f"{os.environ.get('REDIS_URL')}/2", ttl=600, session_id=session_id
-    # )
 
     message_history = MongoDBChatMessageHistory(
         connection_string=os.environ.get("DATABASE_URL"), database_name=db_name, collection_name=collection_name, session_id=session_id
