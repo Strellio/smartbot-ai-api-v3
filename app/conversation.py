@@ -1,5 +1,6 @@
 
 import re
+import os
 from app.agents.assistant.agent import ShopAssistant
 from app.agents.team_selection.chain import SubTeamAnalyzerChain
 
@@ -30,7 +31,7 @@ def markdown_to_text(markdown_string):
 def format_response(response: str):
     response_without_tags = remove_tags(response)
     md_to_text = markdown_to_text(response_without_tags)
-    return md_to_text
+    return md_to_text.replace("AI:", "").replace("Assistant:", "")
 
 
 def conversation(input: Input):
@@ -43,11 +44,11 @@ def conversation(input: Input):
     routing_memory = getMemory(session_id=input.sender, db_name=business.get("account_name"),
                                memory_key="chat_history", collection_name="chat_routing_history")
     sub_team_analyzer_chain = SubTeamAnalyzerChain.from_llm(
-        llm=getLLM(model_name='gpt-4'), verbose=True, memory=routing_memory)
+        llm=getLLM(model_name='gpt-4'), verbose=os.environ.get("VERBOSE"), memory=routing_memory)
     sub_team_id = sub_team_analyzer_chain.run(input=input.message)
     print(sub_team_id)
     shop_assistant = ShopAssistant.init(
-        llm=llm, memory=message_memory, business=business, chat_platform=chat_platform, customer=customer, verbose=True, user_input=input.message, sub_team_id=f"{sub_team_id}")
+        llm=llm, memory=message_memory, business=business, chat_platform=chat_platform, customer=customer, verbose=os.environ.get("VERBOSE"), user_input=input.message, sub_team_id=f"{sub_team_id}")
     # with PromptWatch(api_key=os.getenv("PROMPTWATCH_API_KEY")) as pw:
     output = shop_assistant.run(input=input.message)
     return format_response(output)
