@@ -51,9 +51,6 @@ Don't tell them to find it on our website or any popular shopping website.
  If the tool did not return any response just tell the customer you did not find the product they are looking for.
   
  Don't try helping them as you are not good at helping customrs look for product.
-
-
- 
  """
 
             )

@@ -23,7 +23,7 @@ class SubTeamAnalyzerChain(ConversationChain):
             Now determine the sub-team to route to or keep handling the conversation with the customer base on the customer message  by selecting one from the following options:
             1. Introduction Team: This sub-team handles a customer when the customer initiates a conversation with a greeting. Example is Hello, Hi, Hey, How are you and so on.
             2. Product Search Team: This sub-team handles customers who are looking for a product or asking for information about a product like price, links, options and so on.
-            3. Request order support or report order issue Team: This sub-team handles customers who report issues related to their order, such as cancellations, returns, payment problems, or delivery concerns.
+            3. Request order support or report order/payment issue Team: This sub-team handles customers who report issues related to their order, such as cancellations, returns, payment issues, or delivery concerns.
             4. Follow up on support ticket Team: This sub-team handles customers  seeking to know the resolution status of their support ticket or want to follow up on the support ticket created by sub-team 3
             5. Order status and tracking Team: This sub-team handles customers seeking information about their order. Like getting to know the status of the order and tracking it.
             6. Human Handoff Team: This sub-team handles customers who want to talk to a human being and do not want to talk to any AI assistant or any bot.
