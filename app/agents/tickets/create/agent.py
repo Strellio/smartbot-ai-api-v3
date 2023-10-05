@@ -11,11 +11,14 @@ from langchain.tools import StructuredTool
 
 from app.agents.tickets.create.utils import generateTicketPayload
 from app.services.tickets.create_ticket import createTicket
+from app.utils.llm import getLLM
 from app.utils.memory import getMemory
 
 
 def createSupportTicketTool(customer, business, chat_platform):
     def createSupportTicket(payload):
+        if not payload.get("orderID"):
+            return "Please provide all the required information to allow me create a support ticket."
         ticketInfo = generateTicketPayload(order_id=payload.get(
             "orderID"), ticket_type=payload.get("type"), **payload)
 
@@ -56,9 +59,11 @@ Below are the types of support tickets you can create and the required fields:
 
 Before doing so, review the conversation history only after the customer's latest support request to identify the fields. If not, you should request them from the customer.
 
-Never tell the customer to contact the support team directly. 
+Never tell the customer to contact the support team directly because you are unable to because you have access to a tool for that so you must use a tool.
 
 You must respond according to the previous chat history.
+
+Your response must be concise, clear and straight to the point. Don't apologize to the customer.
 
 After taking the required fields from the customer, use a tool to create the support ticket
 
@@ -82,7 +87,7 @@ After taking the required fields from the customer, use a tool to create the sup
             extra_prompt_messages=[MessagesPlaceholder(variable_name="chat_history")])
 
         agent = OpenAIFunctionsAgent(
-            llm=llm, tools=tools, prompt=prompt)
+            llm=getLLM(model_name="gpt-4"), tools=tools, prompt=prompt)
 
         order_ticket_agent = AgentExecutor.from_agent_and_tools(
             agent=agent, tools=tools, verbose=verbose, max_iterations=max_iterations,  memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),

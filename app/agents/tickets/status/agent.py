@@ -46,6 +46,8 @@ class TicketStatusAgent(BaseModel):
 
                 Never tell the customer to contact the support team directly. 
 
+                Your response must be concise, clear and straight to the point. Don't apologize to the customer.
+
                 After taking the ticket number use a tool to get the ticket details 
 
                 """
