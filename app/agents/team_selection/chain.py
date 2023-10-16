@@ -27,7 +27,7 @@ class SubTeamAnalyzerChain(ConversationChain):
             4. Follow up on support ticket Team: This sub-team handles customers  seeking to know the resolution status of their support ticket or want to follow up on the support ticket created by sub-team 3
             5. Order status and tracking Team: This sub-team handles customers seeking information about their order. Like getting to know the status of the order and tracking it.
             6. Human Handoff Team: This sub-team handles customers who want to talk to a human being and do not want to talk to any AI assistant or any bot.
-            7. Offers and Promotions Team: This sub-team handles customers looking for current offers, promotions, discounts or deals.
+            7. Knowledge base team (Store Policies, FQA's, Promotions and discount, contact information, shipping and delivery) Team: This sub-team handles customers looking for anwers to some frequently ask questions, information about our, return and refund policy, terms of service, shipping policy, order cancellation policy, promotions and discounts and contact information.
 
             Only answer with a number between 1 and 7 indicating the most suitable sub-team to address the customer's query based solely on their last message. If the last customer message does not clearly relate to any specific sub-team, it might be a subsequent communication with the current sub-team so you have to continue with the current sub-team.
             The answer needs to be one number only, no words.
