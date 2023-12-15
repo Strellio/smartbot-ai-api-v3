@@ -4,8 +4,9 @@ from langchain.chat_models import ChatOpenAI
 from pydantic import BaseModel, Field
 from typing import Any
 from langchain.memory import ConversationBufferMemory
-from app.agents.assistant.tools import getHumanHandOffTool, getOffersAndPromos
+from app.agents.assistant.tools import getHumanHandOffTool, getKnowlegeBase
 from app.agents.introduction.chain import IntroductionChain
+from app.agents.knowlege_base.agent import KnowledgeBaseAgent
 
 
 from app.agents.order.track.agent import OrderTrackAgent
@@ -30,7 +31,7 @@ class ShopAssistant(BaseModel):
             "4": TicketStatusAgent.init,
             "5": OrderTrackAgent.init,
             "6": getHumanHandOffTool,
-            "7": getOffersAndPromos
+            "7": KnowledgeBaseAgent.init
         }
 
         handler = sub_team_agent_dict.get(sub_team_id)
