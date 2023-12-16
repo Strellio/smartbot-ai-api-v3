@@ -35,26 +35,26 @@ def format_response(response: str):
 
 
 def conversation(input: Input):
-    # try:
-    input.message = input.message.replace("AI:", "").replace(
-        "Assistant:", "").replace("Customer:", "")
-    llm = getLLM()
-    business, chat_platform = getBusinessAndChatPlatform(input.metadata)
-    customer = getCustomerByPlatform(
-        input.sender, chat_platform.get("platform"))
-    message_memory = getMemory(session_id=input.sender, db_name=business.get("account_name"),
-                               memory_key="chat_history")
-    routing_memory = getMemory(session_id=input.sender, db_name=business.get("account_name"),
-                               memory_key="chat_history", collection_name="chat_routing_history")
-    sub_team_analyzer_chain = SubTeamAnalyzerChain.from_llm(
-        llm=getLLM(), verbose=os.environ.get("VERBOSE"), memory=routing_memory)
-    sub_team_id = sub_team_analyzer_chain.run(input=input.message)
-    print(sub_team_id)
-    shop_assistant = ShopAssistant.init(
-        llm=llm, memory=message_memory, business=business, chat_platform=chat_platform, customer=customer, verbose=os.environ.get("VERBOSE"), user_input=input.message, sub_team_id=f"{sub_team_id}")
-    # with PromptWatch(api_key=os.getenv("PROMPTWATCH_API_KEY")) as pw:
-    output = shop_assistant.run(input=input.message)
-    return format_response(output)
-    # except Exception as e:
-    #     print(e)
-    #     return "Sorry, I experienced an error trying to respond to you. I have notified my team about this. Please try again later."
+    try:
+        input.message = input.message.replace("AI:", "").replace(
+            "Assistant:", "").replace("Customer:", "")
+        llm = getLLM()
+        business, chat_platform = getBusinessAndChatPlatform(input.metadata)
+        customer = getCustomerByPlatform(
+            input.sender, chat_platform.get("platform"))
+        message_memory = getMemory(session_id=input.sender, db_name=business.get("account_name"),
+                                   memory_key="chat_history")
+        routing_memory = getMemory(session_id=input.sender, db_name=business.get("account_name"),
+                                   memory_key="chat_history", collection_name="chat_routing_history")
+        sub_team_analyzer_chain = SubTeamAnalyzerChain.from_llm(
+            llm=getLLM(), verbose=os.environ.get("VERBOSE"), memory=routing_memory)
+        sub_team_id = sub_team_analyzer_chain.run(input=input.message)
+        print(sub_team_id)
+        shop_assistant = ShopAssistant.init(
+            llm=llm, memory=message_memory, business=business, chat_platform=chat_platform, customer=customer, verbose=os.environ.get("VERBOSE"), user_input=input.message, sub_team_id=f"{sub_team_id}")
+        # with PromptWatch(api_key=os.getenv("PROMPTWATCH_API_KEY")) as pw:
+        output = shop_assistant.run(input=input.message)
+        return format_response(output)
+    except Exception as e:
+        print(e)
+        return "Sorry, I experienced an error trying to respond to you. I have notified my team about this. Please try again later."
