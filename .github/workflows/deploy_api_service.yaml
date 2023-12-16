@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - gpt-3.5
     # paths:
     #   - 'backend/api/users/**'
 jobs:

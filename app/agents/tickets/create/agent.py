@@ -87,7 +87,7 @@ After taking the required fields from the customer, use a tool to create the sup
             extra_prompt_messages=[MessagesPlaceholder(variable_name="chat_history")])
 
         agent = OpenAIFunctionsAgent(
-            llm=getLLM(model_name="gpt-4"), tools=tools, prompt=prompt)
+            llm=getLLM(), tools=tools, prompt=prompt)
 
         order_ticket_agent = AgentExecutor.from_agent_and_tools(
             agent=agent, tools=tools, verbose=verbose, max_iterations=max_iterations,  memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),

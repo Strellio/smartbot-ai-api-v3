@@ -19,7 +19,7 @@ class KnowledgeBaseAgent(BaseModel):
     @classmethod
     def init(self, llm: ChatOpenAI, memory, business, customer, chat_platform, verbose=False, max_iterations=10, user_input='') -> "KnowledgeBaseAgent":
 
-        tools = getTools(llm=getLLM(model_name="gpt-4"), memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
+        tools = getTools(llm=getLLM(), memory=memory, verbose=verbose, business=business, customer=customer, chat_platform=chat_platform,
                          max_iterations=max_iterations, user_input=user_input)
 
         system_message = SystemMessage(
@@ -52,7 +52,7 @@ class KnowledgeBaseAgent(BaseModel):
             extra_prompt_messages=[MessagesPlaceholder(variable_name="chat_history")])
 
         agent = OpenAIFunctionsAgent(
-            llm=getLLM(model_name="gpt-4"), tools=tools, prompt=prompt)
+            llm=getLLM(), tools=tools, prompt=prompt)
 
         knowledge_base_agent = AgentExecutor.from_agent_and_tools(
             agent=agent, tools=tools, verbose=verbose, max_iterations=max_iterations, memory=getMemory(session_id=customer.get("_id"), db_name=business.get("account_name"),
