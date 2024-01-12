@@ -1,0 +1,26 @@
+name: Deploy API Backend Service
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    # paths:
+    #   - 'backend/api/users/**'
+jobs:
+  build_setup:
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - shell: bash
+        run: |
+          echo Running Flow
+  call-workflow-passing-data:
+    name: Build Service
+    uses: ./.github/workflows/deploy_backend_service.yaml
+    with:
+      SERVICE_NAME: bot-api
+      WORKING_DIR: ./
+      ENV_FILE_BASE64_SECRET_NAME: ENV_BASE64_STRING
+    secrets: inherit

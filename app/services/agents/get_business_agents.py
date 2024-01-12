@@ -1,9 +1,9 @@
-from lib.db import db
+from app.lib.db import db
 from bson.objectid import ObjectId
 from app.lib.db import agentsModel
 
 
-def getBusinessOnlineAgents(businessId: str):
+def getBusinessOnlineAgent(businessId: str):
     onlineAgents = agentsModel.find_one(
-        {"business": ObjectId(businessId), "is_online": True})
+        {"business": ObjectId(businessId), "availability_status": "available", "status": "A"})
     return onlineAgents

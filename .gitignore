@@ -3,5 +3,7 @@
 **/__pycache__
 app/__pycache__
 app/__pycache__/conversation.cpython-310.pyc
-.env.production
+app/utils/smartbotapi-v2.code-workspace
+pyproject.toml
 .env.enc
+.env.production

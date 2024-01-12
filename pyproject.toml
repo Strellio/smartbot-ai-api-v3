@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "bot-api-v3"
+version = "0.1.0"
+description = "Smartbot AI API"
+authors = ["wisdom0063 <kwartengwisdomug95@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+start = "app.main:start"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+langchain = "0.0.304"
+redis = "5.0.1"
+openai = "0.28.1"
+pandas = "2.1.1"
+gdown = "^4.7.1"
+tiktoken = "0.5.1"
+fastapi = "0.103.2"
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+python-dotenv = "1.0.0"
+pymongo = "4.5.0"
+chromadb = "0.4.13"
+faiss-cpu = "1.7.4"
+datetime = "5.2"
+nanoid = "2.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
