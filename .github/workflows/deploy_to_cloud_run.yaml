@@ -26,19 +26,27 @@ on:
       POOL_PROVIDER:
         required: true
         type: string
+      POOL_NAME:
+        required: true
+        type: string
+      SERVICE_ACCOUNT_NAME:
+        default: smartbot
+        required: false
+        type: string
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.SERVICE_NAME }}
   cancel-in-progress: true
 env:
   PROJECT_NUMBER: ${{ inputs.PROJECT_NUMBER }}
   PROJECT_ID: ${{ inputs.PROJECT_ID }}
-  SERVICE_ACCOUNT: smartbot@${{ inputs.PROJECT_ID }}.iam.gserviceaccount.com
+  SERVICE_ACCOUNT: ${{inputs.SERVICE_ACCOUNT_NAME}}@${{ inputs.PROJECT_ID }}.iam.gserviceaccount.com
   # GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME: ${{ inputs.GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME }}
   SERVICE_NAME: ${{ inputs.SERVICE_NAME }}
   WORKING_DIR: ${{ inputs.WORKING_DIR }}
   # GOOGLE_APPLICATION_CREDENTIALS_BASE64: ${{ secrets[inputs.GOOGLE_APPLICATION_CREDENTIALS_BASE64_SECRET_NAME] }}
   ENV_FILE_BASE64: ${{ secrets[inputs.ENV_FILE_BASE64_SECRET_NAME] }}
   POOL_PROVIDER: ${{ inputs.POOL_PROVIDER }}
+  POOL_NAME: ${{ inputs.POOL_NAME }}
 jobs:
   deploy-to-cloud-run:
     runs-on: "ubuntu-latest"
@@ -76,7 +84,7 @@ jobs:
         name: "Authenticate with Google Cloud"
         uses: "google-github-actions/auth@v1"
         with:
-          workload_identity_provider: "projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/dev-pool/providers/${{ env.POOL_PROVIDER }}"
+          workload_identity_provider: "projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{env.POOL_NAME}}/providers/${{ env.POOL_PROVIDER }}"
           service_account: ${{ env.SERVICE_ACCOUNT }}
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"

@@ -42,12 +42,13 @@ jobs:
     needs: build_setup
     uses: ./.github/workflows/deploy_to_cloud_run.yaml
     with:
-      PROJECT_NUMBER: 530345774393
-      PROJECT_ID: strellio
+      PROJECT_NUMBER: 911728326993
+      PROJECT_ID: smartbot-413622
       SERVICE_NAME: ${{ inputs.SERVICE_NAME }}
       WORKING_DIR: ${{ inputs.WORKING_DIR }}
       # GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME: ${{ inputs.GOOGLE_APPLICATION_CREDENTIALS_FILE_NAME }}
       # GOOGLE_APPLICATION_CREDENTIALS_BASE64_SECRET_NAME: ${{ inputs.GOOGLE_APPLICATION_CREDENTIALS_BASE64_SECRET_NAME }}
       ENV_FILE_BASE64_SECRET_NAME: ${{ inputs.ENV_FILE_BASE64_SECRET_NAME }}
-      POOL_PROVIDER: dev-provider
+      POOL_PROVIDER: my-repo
+      POOL_NAME: github
     secrets: inherit
